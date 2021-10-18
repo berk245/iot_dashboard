@@ -1,0 +1,103 @@
+import React, { useState, useEffect } from "react";
+import { makeStyles } from "@material-ui/styles";
+import { TextField } from "@material-ui/core";
+
+const useStyles = makeStyles(() => ({
+  navbarCard: {
+    width: "99%",
+    borderBottom: "1px solid silver",
+    padding: '1rem 0',
+    "&:hover":{
+        backgroundColor: '#f2f2f2',
+        cursor: 'pointer'
+    }
+  },
+  singleLine: {
+    display: "flex",
+    justifyContent: 'flex-start',
+    marginLeft: '2rem',
+    lineHeight: '0.75rem'
+  },
+}));
+
+
+
+export default function ProjectsNavbar({
+  baseURL,
+  setNavbarState,
+  setSelectedProject,
+}) {
+  const classes = useStyles();
+  const [allProjects, setAllProjects] = useState([]);
+  const [filteredProjects, setFilteredProjects] = useState([])
+  const [searchKeyword, setSearchKeyword] = useState([])
+
+  const getProjects = async () => {
+    const url = baseURL + "/project/get_all";
+    try {
+      let res = await fetch(url);
+      res = await res.json();
+      let arr = [{ name: "Hardcoded Project", id: 42 }, ...JSON.parse(res)];
+      setAllProjects(arr);
+      setFilteredProjects(arr)
+    } catch (err) {
+      console.log("Error while fetching projects");
+      console.log(err);
+    }
+  };
+
+  const searchProject = () =>{
+    let searchResults = allProjects.filter( project => {
+        if(project.name.includes(searchKeyword) ||  String(project.id).includes(searchKeyword)) return true
+        return false 
+    })
+    setFilteredProjects(searchResults)
+  }
+
+  const handleProjectChoice = (project) => {
+    setSelectedProject(project);
+    setNavbarState("selectDryingGroup");
+  };
+
+  const userSearch = (e) =>{
+      setSearchKeyword(e.target.value)
+  }
+
+  useEffect(() => {
+    getProjects();
+  }, []);
+
+  useEffect(() => {
+      searchProject()
+  }, [searchKeyword]);
+
+  return (
+    <>
+      <TextField
+         placeholder='Type to search'
+         variant='outlined'
+         onChange={(e) => userSearch(e)} 
+         style={{padding:'0.5rem 1rem', width:'90%'}}    
+      />
+          
+      {filteredProjects.map((project) => {
+        return (
+          <div
+            className={classes.navbarCard}
+            key={project.id}
+            onClick={() => handleProjectChoice(project)}
+          >
+            <div className={classes.singleLine}>
+              <p style={{fontWeight: 600}}>Project Name:</p> 
+              <p style={{marginLeft: '0.75rem'}}>{project.name}</p>
+            </div>
+            <div className={classes.singleLine}>
+              <p style={{fontWeight: 600}}>Project ID:</p> 
+              <p style={{marginLeft: '0.75rem'}}>{project.id}</p>
+            </div>
+          </div>
+        );
+      })}
+    </>
+  );
+}
