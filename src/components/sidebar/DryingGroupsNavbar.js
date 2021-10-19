@@ -7,6 +7,7 @@ const useStyles = makeStyles(() => ({
   titleSection:{
     display: "flex",
     justifyContent: "flex-start",
+    borderBottom: '1px solid #002884'
   },
   backIcon:{
     border: '2px solid silver',
@@ -101,12 +102,10 @@ export default function DryingGroupsNavbar({
         <BackIcon className={classes.backIcon} onClick={goBack}/>
         <h4>{projectName} Drying Groups</h4>
       </div>
-      <hr />
       {!dryingGroups.length && (
         <p style={{padding: '1rem'}}>This projects does not have any drying groups.</p>
       )}
       {dryingGroups.map((group, index) => {
-        console.log(group);
         return (
           <div
             key={index}

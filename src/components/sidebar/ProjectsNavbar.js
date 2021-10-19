@@ -47,7 +47,7 @@ export default function ProjectsNavbar({
 
   const searchProject = () =>{
     let searchResults = allProjects.filter( project => {
-        if(project.name.includes(searchKeyword) ||  String(project.id).includes(searchKeyword)) return true
+        if(project.name.toLowerCase().includes(searchKeyword.toLowerCase()) ||  String(project.id).includes(searchKeyword)) return true
         return false 
     })
     setFilteredProjects(searchResults)
