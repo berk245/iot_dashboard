@@ -37,9 +37,8 @@ export default function ProjectsNavbar({
     try {
       let res = await fetch(url);
       res = await res.json();
-      let arr = [{ name: "Hardcoded Project", id: 42 }, ...JSON.parse(res)];
-      setAllProjects(arr);
-      setFilteredProjects(arr)
+      setAllProjects(JSON.parse(res));
+      setFilteredProjects(JSON.parse(res))
     } catch (err) {
       console.log("Error while fetching projects");
       console.log(err);
