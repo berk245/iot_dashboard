@@ -1,7 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core";
+import { Button } from "@material-ui/core";
+import BackIcon from '@material-ui/icons/ArrowBackIosRounded';
 
 const useStyles = makeStyles(() => ({
+  titleSection:{
+    display: "flex",
+    justifyContent: "flex-start",
+  },
+  backIcon:{
+    border: '2px solid silver',
+    padding:'0.25rem',
+    margin: 'auto 0.75rem',
+    borderRadius: '20px',
+    "&:hover": {
+      backgroundColor: "#e0e0e0",
+      cursor: "pointer",
+    },
+
+  },
   navbarCard: {
     width: "99%",
     borderBottom: "1px solid silver",
@@ -36,6 +53,7 @@ const useStyles = makeStyles(() => ({
 
 export default function DryingGroupsNavbar({
   baseURL,
+  projectName,
   projectID,
   setNavbarState,
   setSelectedDryingGroup,
@@ -75,10 +93,17 @@ export default function DryingGroupsNavbar({
 
   return (
     <>
-      <button onClick={goBack}>Go Back</button>
+      
 
+      
+
+      <div className={classes.titleSection}>
+        <BackIcon className={classes.backIcon} onClick={goBack}/>
+        <h4>{projectName} Drying Groups</h4>
+      </div>
+      <hr />
       {!dryingGroups.length && (
-        <p>This projects does not have any drying groups</p>
+        <p style={{padding: '1rem'}}>This projects does not have any drying groups.</p>
       )}
       {dryingGroups.map((group, index) => {
         console.log(group);

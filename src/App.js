@@ -51,6 +51,7 @@ function App() {
             <DryingGroupsNavbar
               baseURL={baseURL}
               projectID={selectedProject.id}
+              projectName={selectedProject.name}
               setNavbarState={setNavbarState}
               setSelectedDryingGroup={setSelectedDryingGroup}
               setSelectedProject={setSelectedProject}
