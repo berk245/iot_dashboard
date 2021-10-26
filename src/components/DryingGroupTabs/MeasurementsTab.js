@@ -1,162 +1,232 @@
 import React, { useState, useEffect } from "react";
-import { CircularProgress } from "@material-ui/core";
+import { CircularProgress,TextField, Button } from "@material-ui/core";
+import Select from 'react-select'
 import { makeStyles } from "@material-ui/styles";
 import MultipleLineChartTemplate from "./MultipleLineChart";
 import SingleLineChartTemplate from "./SingleLineChart";
+import MultipleZoomChart from './MultipleZoomChart'
+import SingleZoomChart from "./SingleZoomChart";
 
-const useStyles = makeStyles((theme)=>({
-  chartsContainer:{
-    marginTop: '5rem'
+const useStyles = makeStyles((theme) => ({
+  chartsContainer: {
+    marginTop: "5rem",
+  },
+  measurementParametersSection:{
+    display: 'flex',
+    justifyContent: 'space-around',
+    margin: '2rem 0'
+  },
+  sensorSelector:{
+    flexBasis: '25%',
+    padding:'1rem',
+    borderRadius: '5px',
+    margin: '0.5rem 1rem',
+    background: 'white'
+  },
+  textField:{
+    width:'45%',
+    marginLeft: '1rem'
   }
-}))
+}));
 
-const datePairs = [
-    // Start Time           //End Time
-    ["2021-09-28 00:00:00", "2021-09-28 23:59:59"],
-    ["2021-09-29 00:00:00", "2021-09-29 23:59:59"],
-    ["2021-09-30 00:00:00", "2021-09-30 23:59:00"],
-    ["2021-10-01 00:00:00", "2021-10-01 23:59:59"],
-    ["2021-10-02 00:00:00", "2021-10-02 23:59:59"],
-    ["2021-10-03 00:00:00", "2021-10-03 23:59:59"],
-    ["2021-10-04 00:00:00", "2021-10-04 23:59:59"],
-    ["2021-10-05 00:00:00", "2021-10-05 23:59:59"],
-    ["2021-10-06 00:00:00", "2021-10-06 23:59:59"],
-    ["2021-10-07 00:00:00", "2021-10-07 23:59:59"],
-    ["2021-10-08 00:00:00", "2021-10-08 23:59:59"],
-    ["2021-10-09 00:00:00", "2021-10-09 23:59:59"],
-    ["2021-10-10 00:00:00", "2021-10-10 23:59:59"],
-    ["2021-10-11 00:00:00", "2021-10-11 23:59:59"],
-    ["2021-10-12 00:00:00", "2021-10-12 23:59:59"],
-    ["2021-10-13 00:00:00", "2021-10-13 23:59:59"],
-    ["2021-10-14 00:00:00", "2021-10-14 23:59:59"],
-    ["2021-10-15 00:00:00", "2021-10-15 23:59:59"],
-    ["2021-10-16 00:00:00", "2021-10-16 23:59:59"],
-    ["2021-10-17 00:00:00", "2021-10-17 23:59:59"],
-    ["2021-10-18 00:00:00", "2021-10-18 23:59:59"],
-    ["2021-10-19 00:00:00", "2021-10-19 23:59:59"],
-  ];
-
-
-function MeasurementsTab({ dryingGroup }) {
-  const [measurements, setMeasurements] = useState([]);
-  const [filteredMeasurements, setFilteredMeasurements] = useState({
-    1:[],
-    2:[],
-    3:[],
-    4:[],
-    5:[],
-    6:[],
-    7:[]
-  });
-  const [selectedType, setSelectedType] = useState();
+function MeasurementsTab({ dryingGroup, sensors }) {
+  const [today, setToday] = useState("");
   const [loading, setLoading] = useState(true);
-  const [datesSelected, setDatesSelected] = useState() 
-  const classes = useStyles()
+  const [measurements, setMeasurements] = useState([]);
+  const [selectedSensor, setSelectedSensor] = useState(sensors[0]);
+  const [selectedDates, setSelectedDates] = useState({});
+  const [measurementTypes, setMeasurementTypes] = useState([]);
+  const [measurementUnits, setMeasurementUnits] = useState([]);
+  const [fetchError, setFetchError] = useState(false)
+  //Initialize the default values
+  useEffect(() => {
+    const getToday = () => {
+      const date = new Date();
+      let formattedDate =
+        date.getFullYear() +
+        "-" +
+        (date.getMonth() + 1) +
+        "-" +
+        date.getDate() +
+        " " +
+        date.getHours() +
+        ":" +
+        date.getMinutes() +
+        ":" +
+        date.getSeconds();
+      setToday(formattedDate);
+      return formattedDate;
+    };
+    const getMeasurementTypes = async () => {
+      let url = "https://api.smartdrying.io/measurement_type/get_all";
 
-  const getMeasurements = async () => {
-    setMeasurements([]);
-    let a = [];
+      let types = await fetch(url);
+      types = await types.json();
+      setMeasurementTypes(JSON.parse(types));
+    };
+    const getMeasurementUnits = async () => {
+      let url = "https://api.smartdrying.io/measurement_unit/get_all";
+
+      let units = await fetch(url);
+      units = await units.json();
+      setMeasurementUnits(JSON.parse(units));
+    };
+    const setDefaultStartEndDates = () => {
+      let result = {
+        start_datetime: "",
+        end_datetime: getToday(),
+      };
+      if (dryingGroup.start_date)
+        result.start_datetime = dryingGroup.start_datetime;
+      else result.start_datetime = "2021-09-28 00:00:00";
+      setSelectedDates(result);
+    };
     
-    datePairs.map(async (pair, index) => {
-      let measurement = await makeMeasurementRequest(pair[0], pair[1]);
-      a.push(...measurement);
-    });
+    getToday();
+    getMeasurementTypes();
+    getMeasurementUnits();
+    setDefaultStartEndDates();
+    
+  }, []);
 
-    setTimeout(() => {
-      a = diluteByFive(a)
-      setMeasurements(a);
-      setLoading(false);
-    }, 5000);
-  };
-  const makeMeasurementRequest = async (start_datetime, end_datetime) => {
+  const getMeasurements = async (agg, start, end) => {
+    setFetchError(false)
+    if(!start || !end ) return true
+    
     let url =
-      "https://api.smartdrying.io/measurement/get/drying_group/" +
+      "https://api.smartdrying.io/measurement/aggregated/get/drying_group/" +
       dryingGroup.id;
-    url += `?&start_datetime="${start_datetime}"`;
-    url += `&end_datetime="${end_datetime}"`;
-
+    url += `?aggregation_minutes=${agg}`;
+    url += `&start_datetime=${start}`;
+    url += `&end_datetime=${end}`;
     try {
       let response = await fetch(url);
       response = await response.json();
-      return JSON.parse(response);
+      setMeasurements(JSON.parse(response))
+      return false;
     } catch (err) {
       console.log("failed: ", url);
       console.log(
         "Error while fetching measurements of drying group id:" + dryingGroup.id
       );
       console.log(err);
+      setFetchError(true)
     }
+    return false
   };
-  const filterAndSortMeasurementsByType = () => {
-    if (measurements.length) {  
-      let obj = {...filteredMeasurements}
-      for(let i = 1; i < 8; i++){
-        let newArr = measurements.filter((m) => m.measurement_type_id === i);
-        newArr = formatData(newArr)
-        obj[i] = [...newArr]
+ 
+  useEffect(async() => {
+    
+    let measurementsAreBeingFetched = await getMeasurements(60, selectedDates.start_datetime, selectedDates.end_datetime) //Returns a boolean
+    setLoading(measurementsAreBeingFetched)
+  }, [measurementUnits]);
+
+ 
+  const handleSensorChange = (e) => {
+    let selectedSensorId = (e.target.value)
+    sensors.map((s) => {
+      if(parseInt(s.id) === parseInt(selectedSensorId)){
+        setSelectedSensor(s)
       }
-        setFilteredMeasurements({...obj});
-
+    })
+  }
+  const handleDateChange = (e) => {
+    const {name, value} = e.target
+    console.log(name, value)
+    let obj = {...selectedDates}
+    obj[name] = value;
+    setSelectedDates(obj)
+  }
+  
+  const requestNewCharts = async() =>{
+    setLoading(true)
+    try{
+     setLoading(await getMeasurements(60, selectedDates.start_datetime, selectedDates.end_datetime))
+     console.log(measurements[1])
+    }catch(err){
+      console.log(err)
+      setFetchError(true)
     }
-  };
-
-  const getReadableDates = (arr) =>{
-      arr.forEach((e) => {
-        let date = new Date(e.timestamp)  
-        let formatted = date.getDate()+"/"+(date.getMonth()+1)+"/"+date.getFullYear()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds()
-        e.date = formatted
-      })
-      return arr
   }
-
-  const diluteByFive = (arr) =>{
-      console.log('Before' ,arr.length)
-      arr = arr.filter((val,index) => !(index%5))
-      console.log('After' ,arr.length)
-      return arr
-  }
-
-  const formatData = (arr) =>{
-    arr = sortFilteredMeasurements(arr)
-    arr = getReadableDates(arr)
-    return arr
-  }
-
-  const sortFilteredMeasurements = (arr) => {
-    let newArr = arr.sort(function (x, y) {
-      return x.timestamp - y.timestamp;
-    });
-    return newArr;
-  };
 
   useEffect(() => {
-    getMeasurements()
-  }, [datesSelected]);
+    console.log(selectedSensor.id, 'new Id')
+  }, [selectedSensor]);
 
-  useEffect(() => {
-    filterAndSortMeasurementsByType();
-  }, [measurements]);
-
+  const classes = useStyles();
   return (
     <div>
       {loading && (
-        <div style={{ margin: 'auto' ,marginTop: "5rem" }}>
+        <div style={{ margin: "auto", marginTop: "5rem" }}>
           <p>Fetching data...</p>
           <CircularProgress disableShrink></CircularProgress>
         </div>
       )}
 
       {!loading && (
-        <div className={classes.chartsContainer}>
-            <MultipleLineChartTemplate data={{data1: filteredMeasurements[1], data2: filteredMeasurements[2]}} title={'Two Lines'}></MultipleLineChartTemplate>
-            <SingleLineChartTemplate data={filteredMeasurements[1]} title={'Unit 1'}></SingleLineChartTemplate>
-            <SingleLineChartTemplate data={filteredMeasurements[3]} title={'Unit 3'}></SingleLineChartTemplate>
-            {/* <LineChartComponent data={filteredMeasurements[3]} title={3}></LineChartComponent>
-            <LineChartComponent data={filteredMeasurements[4]} title={4}></LineChartComponent>
-            <LineChartComponent data={filteredMeasurements[5]} title={5}></LineChartComponent>
-            <LineChartComponent data={filteredMeasurements[6]} title={6}></LineChartComponent>
-            <LineChartComponent data={filteredMeasurements[7]} title={7}></LineChartComponent> */}
+        <>
+        <div className={classes.measurementParametersSection}>
+          <div className={classes.sensorSelectSection}>
+        <span>Sensor:</span>
+        <select className={classes.sensorSelector}  placeholder='Choose a sensor' onChange={handleSensorChange}>
+          {sensors.map((sensor, index) => {
+            return(
+            <option value={sensor.id} id={sensor.internal_name} key={index}>{sensor.internal_name} / {sensor.id}</option>
+            )
+          })}
+        </select>
         </div>
+        <div className={classes.dateSelectSection}>
+        <TextField
+        label="Start Date"
+        name="start_datetime"
+        variant="outlined"
+        defaultValue={selectedDates.start_datetime}
+        onChange={(e) => handleDateChange(e)}
+        className={classes.textField}
+        helperText='Format: YYYY-MM-DD HH:MM:SS'
+        />
+        <TextField
+        label="End Date"
+        name="end_datetime"
+        variant="outlined"
+        defaultValue={selectedDates.end_datetime}
+        onChange={(e) => handleDateChange(e)}
+        className={classes.textField}
+        />
+        </div>
+        <div className={classes.submitSection}>
+          <Button
+            variant='outlined'
+            onClick={requestNewCharts}
+            style={{padding: '0.95rem'}}
+          >Submit</Button>
+        </div>
+        </div>
+        {!fetchError&&
+        <div className={classes.chartsContainer}>
+          <h4>{measurements[0].sensor_name} Measurements</h4>
+          <MultipleZoomChart/>
+          <br />
+          <br />
+          <br />
+          <SingleZoomChart/>
+          {/* <MultipleLineChartTemplate data1={filteredMeasurements[1]} data2={filteredMeasurements[2]} title={'Relative Humidity'} unit={measurementUnits[1]}></MultipleLineChartTemplate> */}
+          {/* <MultipleLineChartTemplate data1={filteredMeasurements[3]} data2={filteredMeasurements[4]} title={'Absolute Humidity'} unit={measurementUnits[3]}></MultipleLineChartTemplate> */}
+          {/* <MultipleLineChartTemplate data1={filteredMeasurements[5]} data2={filteredMeasurements[6]} title={'Temperature'} unit={measurementUnits[5]}></MultipleLineChartTemplate> */}
+          {/* <SingleLineChartTemplate data={filteredMeasurements[7]} title={'Pressure'} unit={measurementUnits[7]}></SingleLineChartTemplate> */}{" "}
+          
+          {/* <SingleLineChartTemplate data={filteredMeasurements[1]} title={'Relative Humidity External'} unit={measurementUnits[1]}></SingleLineChartTemplate>
+            <SingleLineChartTemplate data={filteredMeasurements[3]} title={'Absolute Humidty External'} unit={measurementUnits[3]}></SingleLineChartTemplate>
+            <SingleLineChartTemplate data={filteredMeasurements[4]} title={'Absolute Humidty Pipe'} unit={measurementUnits[4]}></SingleLineChartTemplate>
+            <SingleLineChartTemplate data={filteredMeasurements[5]} title={'Temperature External'} unit={measurementUnits[5]}></SingleLineChartTemplate>
+            <SingleLineChartTemplate data={filteredMeasurements[6]} title={'Temperature Pipe'} unit={measurementUnits[6]}></SingleLineChartTemplate> */}
+        </div>
+        }
+        {fetchError && 
+          <h5>An error occured while fetching data. Please make sure that the search parameters (eg, dates) are in correct format and try again.</h5>
+        }
+        </>
       )}
     </div>
   );

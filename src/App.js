@@ -39,7 +39,7 @@ function App() {
     <div className="App">
       <PageHeader/>
       <Grid container>
-        <Grid item sm={3} className={classes.navbarContainer}>
+        <Grid item sm={6} md={4} lg={3} className={classes.navbarContainer}>
           {navbarState === "selectProject" && (
             <ProjectsNavbar
               baseURL={baseURL}
@@ -59,7 +59,7 @@ function App() {
           )}
         </Grid>
         {selectedDryingGroup&&
-          <Grid item sm={9} className={classes.dryingGroupData}>
+          <Grid item sm={6} md={8} lg={9} className={classes.dryingGroupData}>
             <DryingGroupOverview baseURL={baseURL} dryingGroup={selectedDryingGroup}></DryingGroupOverview>
           </Grid>
         }

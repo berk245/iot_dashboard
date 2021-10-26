@@ -7,7 +7,8 @@ const useStyles = makeStyles((theme => ({
         width: '100%',
         margin: '2rem 0',
         borderWidth: '0 0.5px 0.5px 0.5px',
-        border: 'solid silver'
+        border: 'solid silver',
+        overflow: 'hidden'
     },
     tabBar:{
         display: 'flex',
@@ -55,6 +56,7 @@ function TabContainer({dryingGroup, sensors}) {
                 <div className={selectedTab == 'alarms' ? classes.selectedTab : classes.singleTab} onClick={()=>{setSelectedTab('alarms')}}>Alarms</div>
             </div>
             <div className={classes.tabContent}>
+                 
                 {selectedTab === 'measurements' &&
                     <MeasurementsTab dryingGroup={dryingGroup} sensors={sensors}></MeasurementsTab>
                 }
