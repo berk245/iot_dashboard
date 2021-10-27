@@ -32,18 +32,7 @@ export default function ProjectsNavbar({
   const [filteredProjects, setFilteredProjects] = useState([])
   const [searchKeyword, setSearchKeyword] = useState([])
 
-  const getProjects = async () => {
-    const url = baseURL + "/project/get_all";
-    try {
-      let res = await fetch(url);
-      res = await res.json();
-      setAllProjects(JSON.parse(res));
-      setFilteredProjects(JSON.parse(res))
-    } catch (err) {
-      console.log("Error while fetching projects");
-      console.log(err);
-    }
-  };
+  
 
   const searchProject = () =>{
     let searchResults = allProjects.filter( project => {
@@ -63,12 +52,24 @@ export default function ProjectsNavbar({
   }
 
   useEffect(() => {
+    const getProjects = async () => {
+    const url = baseURL + "/project/get_all";
+    try {
+      let res = await fetch(url);
+      res = await res.json();
+      setAllProjects(JSON.parse(res));
+      setFilteredProjects(JSON.parse(res))
+    } catch (err) {
+      console.log("Error while fetching projects");
+      console.log(err);
+    }
+  };
     getProjects();
   }, []);
 
   useEffect(() => {
       searchProject()
-  }, [searchKeyword]);
+  }, [searchKeyword]);// eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>

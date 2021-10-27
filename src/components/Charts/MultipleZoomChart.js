@@ -102,7 +102,6 @@ export default class App extends Component {
     const { data, left, right, refAreaLeft, refAreaRight, top, bottom } =
       this.state;
 
-    console.log(this.state);
 
     return (
       <div className="highlight-bar-charts" style={{ userSelect: "none" }}>

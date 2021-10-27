@@ -25,6 +25,7 @@ function InfoTab({ dryingGroup, dryingTypes }) {
                 if(type.id == dryingGroup.drying_type_id){
                     setDryingType(type.drying_type.toUpperCase())
                 }
+                return true
             })
         }
         setReadableDryingType()

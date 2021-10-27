@@ -38,15 +38,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function DryingGroupOverview({ baseURL, dryingGroup }) {
+export default function DryingGroupOverview({ baseURL, dryingGroup, dryingTypes, measurementTypes, measurementOperators, measurementUnits }) {
   const [loading, setLoading] = useState(true);
   const [sensors, setSensors] = useState([]);
-  const [dryingTypes, setDryingTypes] = useState([])
-
+  const [startStopCriteria, setStartStopCriteria] = useState([])
   const classes = useStyles();
 
 
-  useEffect(async() => {
+  useEffect(() => {
     //Get Sensors
     const getSensors = async () => {
       const url = baseURL + "/sensor/get/drying_group/" + dryingGroup.id;
@@ -63,26 +62,30 @@ export default function DryingGroupOverview({ baseURL, dryingGroup }) {
         console.log(err);
       }
     };
-    const getDryingTypes = async() =>{
-      try{
-        let url = 'https://api.smartdrying.io/drying_type/get_all'
-        let res = await fetch(url)
-        res = await res.json()
-        setDryingTypes(JSON.parse(res))
-        }
-        catch(err){
-          console.log(
-            "Error while fetching measurement types "
-          );
-          console.log(err)
-          return
-        }
-  }
-  
+   
+    const getStartStopCriteria = async() => {
+      let url = baseURL + '/dry_threshold/get/drying_group/'+dryingGroup.id
+      try {
+        let response = await fetch(url);
+        response = await response.json();
+        setStartStopCriteria(JSON.parse(response));
+      } catch (err) {
+        console.log(
+          "Error while fetching threshold data of drying group id:" +
+            dryingGroup.id
+        );
+        console.log(err);
+      }
+    }
 
-    setLoading(true);
-    await getDryingTypes()
-    getSensors();
+    const runAsyncInitializer = async() => {
+      setLoading(true);
+      await getStartStopCriteria()
+      getSensors();
+    }
+
+    runAsyncInitializer()
+    
 
   }, [dryingGroup]);
 
@@ -120,6 +123,10 @@ export default function DryingGroupOverview({ baseURL, dryingGroup }) {
             dryingGroup={dryingGroup}
             sensors={sensors}
             dryingTypes={dryingTypes}
+            measurementTypes={measurementTypes}
+            measurementUnits={measurementUnits}
+            measurementOperators={measurementOperators}
+            startStopCriteria={startStopCriteria}
           ></TabContainer>
         </div>
       )}

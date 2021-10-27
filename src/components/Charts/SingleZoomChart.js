@@ -10,24 +10,6 @@ import {
 } from "recharts";
 
 
-const getAxisYDomain = (
-    from,
-    to,
-    ref,
-    offset
-  ) => {
-    const refData = initialData.slice(from - 1, to);
-    let [bottom, top] = [refData[0][ref], refData[0][ref]];
-  
-    refData.forEach((d) => {
-      if (d[ref] > top) top = d[ref];
-      if (d[ref] < bottom) bottom = d[ref];
-    });
-  
-    return [(bottom | 0) - offset, (top | 0) + offset];
-  };
-
-
 const initialData = [
   { name: 1, cost: 14.11 },
   { name: 2, cost: 12.39 },

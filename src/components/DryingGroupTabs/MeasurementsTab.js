@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { CircularProgress,TextField, Button } from "@material-ui/core";
-import Select from 'react-select'
 import { makeStyles } from "@material-ui/styles";
 import MultipleZoomChart from '../Charts/MultipleZoomChart'
 import SingleZoomChart from "../Charts/SingleZoomChart";
@@ -85,6 +84,8 @@ function MeasurementsTab({ dryingGroup, sensors }) {
     getMeasurementUnits();
     setDefaultStartEndDates();
     
+    console.log(today, measurements.length, measurementTypes.length)
+
   }, []);
 
   const getMeasurements = async (agg, start, end) => {
@@ -113,13 +114,16 @@ function MeasurementsTab({ dryingGroup, sensors }) {
     return false
   };
  
-  useEffect(async() => {
-    
-    let measurementsAreBeingFetched = await getMeasurements(60, selectedDates.start_datetime, selectedDates.end_datetime) //Returns a boolean
-    setLoading(measurementsAreBeingFetched)
+  useEffect(() => {
+    const measurementsInitializer = async() => {
+      let measurementsAreBeingFetched = await getMeasurements(60, selectedDates.start_datetime, selectedDates.end_datetime) //Returns a boolean
+      setLoading(measurementsAreBeingFetched)
+    }
+
+    measurementsInitializer()
+   
   }, [measurementUnits]);
 
- 
   const handleSensorChange = (e) => {
     let selectedSensorId = (e.target.value)
     sensors.map((s) => {
@@ -130,7 +134,6 @@ function MeasurementsTab({ dryingGroup, sensors }) {
   }
   const handleDateChange = (e) => {
     const {name, value} = e.target
-    console.log(name, value)
     let obj = {...selectedDates}
     obj[name] = value;
     setSelectedDates(obj)
@@ -140,7 +143,6 @@ function MeasurementsTab({ dryingGroup, sensors }) {
     setLoading(true)
     try{
      setLoading(await getMeasurements(60, selectedDates.start_datetime, selectedDates.end_datetime))
-     console.log(measurements[1])
     }catch(err){
       console.log(err)
       setFetchError(true)
@@ -148,7 +150,7 @@ function MeasurementsTab({ dryingGroup, sensors }) {
   }
 
   useEffect(() => {
-    console.log(selectedSensor.id, 'new Id')
+    console.log(selectedSensor.id, 'new sensor selected')
   }, [selectedSensor]);
 
   const classes = useStyles();
@@ -203,7 +205,7 @@ function MeasurementsTab({ dryingGroup, sensors }) {
         </div>
         {!fetchError&&
         <div className={classes.chartsContainer}>
-          <h4>{measurements[0].sensor_name} Measurements</h4>
+          {/* <h4>{measurements[0].sensor_name} Measurements</h4> */}
           <MultipleZoomChart/>
           <br />
           <br />
