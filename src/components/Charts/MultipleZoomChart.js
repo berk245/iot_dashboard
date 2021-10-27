@@ -7,11 +7,10 @@ import {
   CartesianGrid,
   Tooltip,
   ReferenceArea,
-  ReferenceDot
+  ReferenceDot,
 } from "recharts";
 
 const initialData = [
-  { name: 1, cost: 14.11, impression: 15 },
   { name: 2, cost: 12.39, impression: 14 },
   { name: 3, cost: 12.37, impression: 13 },
   { name: 4, cost: 13.16, impression: 13.1 },
@@ -43,7 +42,6 @@ const initialData = [
   { name: 30, cost: 12.79, impression: 13.7 },
   { name: 31, cost: 12.94, impression: 12.9 },
 ];
-
 
 const initialState = {
   data: initialData,
@@ -78,15 +76,14 @@ export default class App extends Component {
     if (refAreaLeft > refAreaRight)
       [refAreaLeft, refAreaRight] = [refAreaRight, refAreaLeft];
 
-
     this.setState(() => ({
       refAreaLeft: "",
       refAreaRight: "",
       data: data.slice(),
       left: refAreaLeft,
       right: refAreaRight,
-      top: 'dataMax + 1',
-      bottom: 'dataMin - 1'
+      top: "dataMax + 1",
+      bottom: "dataMin - 1",
     }));
   }
 
@@ -102,7 +99,8 @@ export default class App extends Component {
   }
 
   render() {
-    const { data, left, right, refAreaLeft, refAreaRight, top, bottom } = this.state;
+    const { data, left, right, refAreaLeft, refAreaRight, top, bottom } =
+      this.state;
 
     console.log(this.state);
 
@@ -112,7 +110,12 @@ export default class App extends Component {
           width={800}
           height={400}
           data={data}
-          onMouseDown={(e) => this.setState({ refAreaLeft: e.activeLabel, refAreaRight: e.activeLabel })}
+          onMouseDown={(e) =>
+            this.setState({
+              refAreaLeft: e.activeLabel,
+              refAreaRight: e.activeLabel,
+            })
+          }
           onMouseMove={(e) =>
             this.state.refAreaLeft &&
             this.setState({ refAreaRight: e.activeLabel })
@@ -148,11 +151,14 @@ export default class App extends Component {
             stroke="#82ca9d"
             animationDuration={300}
           />
-          <ReferenceDot
-
-          ></ReferenceDot>
+          <ReferenceDot></ReferenceDot>
           {refAreaLeft ? (
-            <ReferenceArea yAxisId="1" x1={refAreaLeft} x2={refAreaRight} strokeOpacity={0.2} />
+            <ReferenceArea
+              yAxisId="1"
+              x1={refAreaLeft}
+              x2={refAreaRight}
+              strokeOpacity={0.2}
+            />
           ) : null}
         </LineChart>
         {left !== "dataMin" && (

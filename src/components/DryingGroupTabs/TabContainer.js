@@ -1,5 +1,6 @@
 import { makeStyles } from '@material-ui/core'
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
+import InfoTab from './InfoTab'
 import MeasurementsTab from './MeasurementsTab'
 
 const useStyles = makeStyles((theme => ({
@@ -42,7 +43,7 @@ const useStyles = makeStyles((theme => ({
     }
 })))
 
-function TabContainer({dryingGroup, sensors}) {
+function TabContainer({dryingGroup, sensors,dryingTypes}) {
 
     const [selectedTab, setSelectedTab] = useState('info')
 
@@ -56,7 +57,9 @@ function TabContainer({dryingGroup, sensors}) {
                 <div className={selectedTab == 'alarms' ? classes.selectedTab : classes.singleTab} onClick={()=>{setSelectedTab('alarms')}}>Alarms</div>
             </div>
             <div className={classes.tabContent}>
-                 
+                {selectedTab === 'info' &&
+                    <InfoTab dryingGroup={dryingGroup} dryingTypes={dryingTypes}></InfoTab>
+                } 
                 {selectedTab === 'measurements' &&
                     <MeasurementsTab dryingGroup={dryingGroup} sensors={sensors}></MeasurementsTab>
                 }

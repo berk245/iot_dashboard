@@ -2,10 +2,8 @@ import React, { useState, useEffect } from "react";
 import { CircularProgress,TextField, Button } from "@material-ui/core";
 import Select from 'react-select'
 import { makeStyles } from "@material-ui/styles";
-import MultipleLineChartTemplate from "./MultipleLineChart";
-import SingleLineChartTemplate from "./SingleLineChart";
-import MultipleZoomChart from './MultipleZoomChart'
-import SingleZoomChart from "./SingleZoomChart";
+import MultipleZoomChart from '../Charts/MultipleZoomChart'
+import SingleZoomChart from "../Charts/SingleZoomChart";
 
 const useStyles = makeStyles((theme) => ({
   chartsContainer: {
