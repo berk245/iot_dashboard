@@ -26,14 +26,13 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-function MeasurementsTab({ dryingGroup, sensors }) {
+function MeasurementsTab({ dryingGroup, sensors, measurementTypes, measurementUnits }) {
   const [today, setToday] = useState("");
   const [loading, setLoading] = useState(true);
   const [measurements, setMeasurements] = useState([]);
   const [selectedSensor, setSelectedSensor] = useState(sensors[0]);
   const [selectedDates, setSelectedDates] = useState({});
-  const [measurementTypes, setMeasurementTypes] = useState([]);
-  const [measurementUnits, setMeasurementUnits] = useState([]);
+  
   const [fetchError, setFetchError] = useState(false)
   //Initialize the default values
   useEffect(() => {
@@ -54,20 +53,7 @@ function MeasurementsTab({ dryingGroup, sensors }) {
       setToday(formattedDate);
       return formattedDate;
     };
-    const getMeasurementTypes = async () => {
-      let url = "https://api.smartdrying.io/measurement_type/get_all";
 
-      let types = await fetch(url);
-      types = await types.json();
-      setMeasurementTypes(JSON.parse(types));
-    };
-    const getMeasurementUnits = async () => {
-      let url = "https://api.smartdrying.io/measurement_unit/get_all";
-
-      let units = await fetch(url);
-      units = await units.json();
-      setMeasurementUnits(JSON.parse(units));
-    };
     const setDefaultStartEndDates = () => {
       let result = {
         start_datetime: "",
@@ -78,13 +64,9 @@ function MeasurementsTab({ dryingGroup, sensors }) {
       else result.start_datetime = "2021-09-28 00:00:00";
       setSelectedDates(result);
     };
-    
     getToday();
-    getMeasurementTypes();
-    getMeasurementUnits();
     setDefaultStartEndDates();
     
-    console.log(today, measurements.length, measurementTypes.length)
 
   }, []);
 
@@ -98,10 +80,13 @@ function MeasurementsTab({ dryingGroup, sensors }) {
     url += `?aggregation_minutes=${agg}`;
     url += `&start_datetime=${start}`;
     url += `&end_datetime=${end}`;
+
     try {
       let response = await fetch(url);
       response = await response.json();
+      console.log(response.length)
       setMeasurements(JSON.parse(response))
+
       return false;
     } catch (err) {
       console.log("failed: ", url);
