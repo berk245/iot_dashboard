@@ -2,6 +2,8 @@ import { makeStyles } from "@material-ui/core";
 import React, { useState, useEffect } from "react";
 import { Button } from "@material-ui/core";
 
+
+
 const useStyles = makeStyles(() => ({
   orGroup: {
     outline: "1px solid #002884",
@@ -20,8 +22,14 @@ const useStyles = makeStyles(() => ({
     fontSize: "0.9rem",
     marginTop: "0.5rem",
     display: "flex",
+    flexWrap: 'wrap',
     justifyContent: "space-between",
     alignItems: "center",
+  
+  },
+  
+  cellTitle:{
+    fontWeight: 600,
   },
   removeButton: {
     textTransform: "none",
@@ -87,15 +95,15 @@ function CriteriaTab({
                         key={andIndex}
                         className={classes.completeAndCondition}
                       >
-                        <div className={classes.andConditionCell}>
+                        <div>
                           <p style={{ fontWeight: "600" }}> Sensor Id</p>
                           <p>{andCondition.sensor_id}</p>
                         </div>
-                        <div className={classes.andConditionCell}>
+                        <div>
                           <p style={{ fontWeight: "600" }}> Sensor Name</p>
                           <p>{sensorNameAndIdPairs[andCondition.sensor_id]}</p>
                         </div>
-                        <div className={classes.andConditionCell}>
+                        <div>
                           <p style={{ fontWeight: "600" }}> Measurement Type</p>
                           <p>
                             {
@@ -105,16 +113,15 @@ function CriteriaTab({
                             }
                           </p>
                         </div>
-                        <div className={classes.andConditionCell}>
+                        <div>
                           <p style={{ fontWeight: "600" }}> Condition</p>
                           <p>{operatorNameAndIdPairs[andCondition.operator_id]} {andCondition.threshold} </p>
                         </div>
-                        <div className={classes.andConditionCell}>
+                        <div>
                           <p style={{ fontWeight: "600" }}> Unit</p>
                           <p>{unitNameAndIdPairs[andCondition.measurement_unit_id]}</p>
                         </div>
-                        <div className={classes.andConditionCell}>
-                          <p style={{ fontWeight: "600" }}></p>
+                        <div>
                           <Button
                             variant="outlined"
                             size="small"
@@ -123,6 +130,7 @@ function CriteriaTab({
                           >
                             Remove
                           </Button>
+
                         </div>
                         
                       </div>
