@@ -42,23 +42,23 @@ function AlarmsTab({
       {alarms && (
         <table className={classes.sensorTable}>
           <tr >
-            <th style={{borderBottom:'1px solid silver'}}>Sensor</th>
-            <th style={{borderBottom:'1px solid silver'}}>Measurement Type</th>
-            <th style={{borderBottom:'1px solid silver'}}>Min Threshold</th>
-            <th style={{borderBottom:'1px solid silver'}}>Max Threshold</th>
-            <th style={{borderBottom:'1px solid silver'}}>Measurement Unit</th>
+            <th style={{borderBottom:'2px solid silver'}}>Sensor</th>
+            <th style={{borderBottom:'2px solid silver'}}>Measurement Type</th>
+            <th style={{borderBottom:'2px solid silver'}}>Min Threshold</th>
+            <th style={{borderBottom:'2px solid silver'}}>Max Threshold</th>
+            <th style={{borderBottom:'2px solid silver'}}>Measurement Unit</th>
           </tr>
           {alarms.map((alarm, index) => {
             return (
               <>
                 <tr key={index}>
-                  <td>
+                  <td style={{borderBottom:'1px solid silver', padding: '0.25rem'}}>
                     {sensorNameAndIdPairs[alarm.sensor_id]} / {alarm.sensor_id}
                   </td>
-                  <td>{typeNameAndIdPairs[alarm.measurement_type_id]}</td>
-                  <td>{alarm.min_allowed_threshold}</td>
-                  <td>{alarm.max_allowed_threshold}</td>
-                  <td>{unitNameAndIdPairs[alarm.measurement_type_id]}</td>
+                  <td style={{borderBottom:'1px solid silver', padding: '0.25rem'}}>{typeNameAndIdPairs[alarm.measurement_type_id]}</td>
+                  <td style={{borderBottom:'1px solid silver', padding: '0.25rem'}}>{alarm.min_allowed_threshold}</td>
+                  <td style={{borderBottom:'1px solid silver', padding: '0.25rem'}}>{alarm.max_allowed_threshold}</td>
+                  <td style={{borderBottom:'1px solid silver', padding: '0.25rem'}}>{unitNameAndIdPairs[alarm.measurement_type_id]}</td>
                 </tr>
               </>
             );
