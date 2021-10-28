@@ -23,7 +23,16 @@ const useStyles = makeStyles((theme) => ({
   textField:{
     width:'45%',
     marginLeft: '1rem'
-  }
+  },
+  sensorTable: {
+    width: "95%",
+    margin: "2rem auto",
+    outline: "1px solid silver",
+    borderRadius: "5px",
+    padding: "1rem",
+    fontSize: "0.9rem",
+    lineHeight: "2rem",
+  },
 }));
 
 function MeasurementsTab({ dryingGroup, sensors, measurementTypes, measurementUnits }) {
@@ -101,8 +110,9 @@ function MeasurementsTab({ dryingGroup, sensors, measurementTypes, measurementUn
  
   useEffect(() => {
     const measurementsInitializer = async() => {
-      let measurementsAreBeingFetched = await getMeasurements(60, selectedDates.start_datetime, selectedDates.end_datetime) //Returns a boolean
-      setLoading(measurementsAreBeingFetched)
+      // let measurementsAreBeingFetched = await getMeasurements(60, selectedDates.start_datetime, selectedDates.end_datetime) //Returns a boolean
+      // setLoading(measurementsAreBeingFetched)
+      setLoading(false)
     }
 
     measurementsInitializer()
@@ -127,7 +137,7 @@ function MeasurementsTab({ dryingGroup, sensors, measurementTypes, measurementUn
   const requestNewCharts = async() =>{
     setLoading(true)
     try{
-     setLoading(await getMeasurements(60, selectedDates.start_datetime, selectedDates.end_datetime))
+      setLoading(await getMeasurements(60, selectedDates.start_datetime, selectedDates.end_datetime))
     }catch(err){
       console.log(err)
       setFetchError(true)
@@ -150,6 +160,36 @@ function MeasurementsTab({ dryingGroup, sensors, measurementTypes, measurementUn
 
       {!loading && (
         <>
+        {sensors.length && 
+        <div>
+          <table className={classes.sensorTable}>
+            <tr >
+              <th style={{borderBottom:'2px solid silver'}}>Sensor name</th>
+              <th style={{borderBottom:'2px solid silver'}}> Sensor ID</th>
+              <th style={{borderBottom:'2px solid silver'}}> DeveUI</th>
+              <th style={{borderBottom:'2px solid silver'}}>Sensor Type</th>
+              <th style={{borderBottom:'2px solid silver'}}>Description</th>
+            </tr>
+            {sensors.map((sensor, index) => {
+              console.log(sensor)
+              return (
+                <>
+                  <tr key={index}>
+                    <td style={{borderBottom:'1px solid silver', padding: '0.25rem'}}>
+                     {sensor.internal_name}
+                    </td>
+                    <td style={{borderBottom:'1px solid silver', padding: '0.25rem'}}>{sensor.id}</td>
+                    <td style={{borderBottom:'1px solid silver', padding: '0.25rem'}}>{sensor.deveui}</td>
+                    <td style={{borderBottom:'1px solid silver', padding: '0.25rem'}}>{sensor.type}</td>
+                    <td style={{borderBottom:'1px solid silver', padding: '0.25rem'}}>{sensor.description}</td>
+                  </tr>
+                </>
+              );
+            })}
+          </table>
+        
+      </div>
+        }
         <div className={classes.measurementParametersSection}>
           <div className={classes.sensorSelectSection}>
         <span>Sensor:</span>
