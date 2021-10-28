@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import InfoTab from "./InfoTab";
 import MeasurementsTab from "./MeasurementsTab";
 import CriteriaTab from "./CriteriaTab";
+import AlarmsTab from "./AlarmsTab";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -167,6 +168,17 @@ function TabContainer({
             operatorNameAndIdPairs= {operatorNameAndIdPairs}
             
           ></CriteriaTab>
+        )}
+        {selectedTab === "alarms" && (
+          <AlarmsTab
+            dryingGroup={dryingGroup}
+            startStopCriteria={startStopCriteria}
+            sensors={sensors}
+            sensorNameAndIdPairs= {sensorNameAndIdPairs}
+            typeNameAndIdPairs= {typeNameAndIdPairs}
+            unitNameAndIdPairs= {unitNameAndIdPairs}
+            operatorNameAndIdPairs= {operatorNameAndIdPairs}
+          ></AlarmsTab>
         )}
       </div>
     </div>
