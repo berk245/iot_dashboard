@@ -110,9 +110,8 @@ function MeasurementsTab({ dryingGroup, sensors, measurementTypes, measurementUn
  
   useEffect(() => {
     const measurementsInitializer = async() => {
-      // let measurementsAreBeingFetched = await getMeasurements(60, selectedDates.start_datetime, selectedDates.end_datetime) //Returns a boolean
-      // setLoading(measurementsAreBeingFetched)
-      setLoading(false)
+      let measurementsAreBeingFetched = await getMeasurements(60, selectedDates.start_datetime, selectedDates.end_datetime) //Returns a boolean
+      setLoading(measurementsAreBeingFetched)
     }
 
     measurementsInitializer()
