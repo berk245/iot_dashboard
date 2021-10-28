@@ -8,7 +8,7 @@ import {
   Tooltip,
   ReferenceArea
 } from "recharts";
-
+import DownloadChartData from "./helpers/DownloadChartData";
 
 const initialData = [
   { name: 1, cost: 14.11 },
@@ -160,6 +160,9 @@ export default class App extends Component {
             />
           ) : null}
         </LineChart>
+        <button onClick={() => {DownloadChartData(initialData)}}>
+          Download
+        </button>
         {left !== "dataMin" && (
           <button
             type="button"
