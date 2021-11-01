@@ -79,16 +79,14 @@ function CriteriaTab({
     <div>
       <div style={{ margin: "1rem 2rem" }}>
         <h4>Stop/Start Criterion</h4>
-        <p>Each blue box represent a condition block.</p>
         <hr />
       </div>
-      {criterion.length &&
+      {criterion.length ?
         criterion.map((group, index) => {
           return (
             <>
               <div key={index} className={classes.orGroup}>
                 {group.and.map((andCondition, andIndex) => {
-                    console.log(andCondition)
                   return (
                     <>
                       <div
@@ -171,7 +169,9 @@ function CriteriaTab({
               )}
             </>
           );
-        })}
+        }):
+        <p style={{padding:'1rem 2rem'}}>This project does not have any stop/start crtierion</p>
+        }
     </div>
   );
 }
