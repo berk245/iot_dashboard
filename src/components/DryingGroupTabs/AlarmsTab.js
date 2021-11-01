@@ -25,11 +25,12 @@ function AlarmsTab({
     getAlarms();
   }, []);
 
+  console.log(alarms, alarms == true)
+
+
   return (
     <div>
-      {alarms && (
         <AlarmsTable alarms={alarms} sensorNameAndIdPairs={sensorNameAndIdPairs} typeNameAndIdPairs={typeNameAndIdPairs} unitNameAndIdPairs={unitNameAndIdPairs} /> 
-      )}
     </div>
   );
 }
