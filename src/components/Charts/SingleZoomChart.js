@@ -12,6 +12,10 @@ import {
 import { ResponsiveContainer } from "recharts/lib/component/ResponsiveContainer";
 import DownloadChartData from "./helpers/DownloadChartData";
 
+
+
+
+
 export default class SingleZoomChart extends React.Component {
   
   constructor(props){
@@ -27,7 +31,17 @@ export default class SingleZoomChart extends React.Component {
       animation: true,
     }
   }
-  
+  // addTimestamps(arr){
+  //   let result = []
+
+  //   arr.map(item => {
+  //     let timestamp = new Date(item.measurement_interval).getTime()
+  //     if(1634610000 < timestamp < 1634750000) console.log(timestamp,item.measurement_interval)
+  //     let newItem = {...item, timestamp: timestamp}
+  //     result.push(newItem)
+  //   })
+  //   return(result)
+  // }
 
   zoom (){
     let { refAreaLeft, refAreaRight, data } = this.state;
@@ -57,9 +71,39 @@ export default class SingleZoomChart extends React.Component {
       top: "dataMax + 1",
     }));
 
+   
     
   }
+  
+  handleMouseDown(e){
+    try{
+      this.setState({ refAreaLeft: e.activeLabel })
+    }catch{
+      console.log('Click out of bounds')
+    }
+  }
 
+  handleMouseMove(e){
+    try{
+      this.state.refAreaLeft && this.setState({ refAreaRight: e.activeLabel })
+    }catch{
+      console.log('Click out of bounds')
+    }
+  }
+
+  formatXAxis(tickItem) {
+    // let label = new Date(tickItem).toLocaleDateString('de-DE') + ' ' + new Date(tickItem).toLocaleTimeString('de-DE')
+    // return label
+    let label = '';
+    let splited = tickItem.split(' ')
+    if(splited[1] == '01:00:00'){
+      label = splited[0]
+    }
+    return label
+  
+  }
+
+ 
 
 
   render(){
@@ -70,16 +114,16 @@ export default class SingleZoomChart extends React.Component {
           {data&&
           <div className="highlight-bar-charts" style={{ userSelect: "none" }}>
             <h3>{this.props.title.toUpperCase() }</h3>
-            <ResponsiveContainer width="90%" height={400}>
+            <ResponsiveContainer width="90%" height={450}>
               <LineChart
                 data={data}
-                onMouseDown={(e) => this.setState({ refAreaLeft: e.activeLabel })}
-                onMouseMove={(e) => this.state.refAreaLeft && this.setState({ refAreaRight: e.activeLabel })}
+                onMouseDown={(e) => this.handleMouseDown(e)}
+                onMouseMove={(e) => this.handleMouseMove(e)}
                 // eslint-disable-next-line react/jsx-no-bind
                 onMouseUp={this.zoom.bind(this)}
               >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis allowDataOverflow domain={[left, right]} dataKey='measurement_interval' />
+                <XAxis height={175} tickMargin={10} angle={-10} padding={{left:50, right:20}} interval={100}  allowDataOverflow domain={[left, right]} dataKey='measurement_interval' />
                 <YAxis allowDataOverflow domain={[bottom, top]}  type="number" yAxisId="1" />
                 <Tooltip />
                 <Line
@@ -125,3 +169,5 @@ export default class SingleZoomChart extends React.Component {
   }
   
 }
+
+

@@ -35,8 +35,8 @@ function MeasurementsTab({ dryingGroup, sensors, measurementTypes, measurementUn
   const [measurements, setMeasurements] = useState([]);
   const [selectedSensor, setSelectedSensor] = useState(sensors[0]);
   const [selectedDates, setSelectedDates] = useState({});
-  const [filteredMeasurements, setFilteredMeasurements] = useState({})
-  const [measurementsFiltered, setMeasurementsFiltered] = useState(false)
+  const [groupedMeasurements, setGroupedMeasurements] = useState({})
+  const [measurementsGrouped, setMeasurementsGrouped] = useState(false)
 
   const [fetchError, setFetchError] = useState(false)
   //Initialize the default values
@@ -110,14 +110,18 @@ function MeasurementsTab({ dryingGroup, sensors, measurementTypes, measurementUn
   }, [today]);
 
   useEffect(() => {
-    let result = {}
-    for(let type of measurementTypes){
-      let filter = measurements.filter((m) => m.measurement_id === type.id)
-      result[type.name] = filter
+    const groupMeasurementsByType = () =>{
+      let result = {}
+      for(let type of measurementTypes){
+        let filter = measurements.filter((m) => m.measurement_id === type.id)
+        result[type.name] = filter
+      }
+      setGroupedMeasurements(result)
+      if(measurements.length) setMeasurementsGrouped(true)
     }
-    setFilteredMeasurements(result)
+      
+    groupMeasurementsByType()
 
-    if(measurements.length) setMeasurementsFiltered(true)
   }, [measurements]);
 
 
@@ -208,12 +212,12 @@ function MeasurementsTab({ dryingGroup, sensors, measurementTypes, measurementUn
           <br />
           <br />
           <br />
-          {measurementsFiltered? 
+          {measurementsGrouped? 
               <>
-              {Object.keys(filteredMeasurements).map((key,index) => {
-                if(filteredMeasurements[key].length){
+              {Object.keys(groupedMeasurements).map((key,index) => {
+                if(groupedMeasurements[key].length){
                   return(
-                    <SingleZoomChart key={index} title={key} data={filteredMeasurements[key]}/>
+                    <SingleZoomChart key={index} title={key} data={groupedMeasurements[key]}/>
                     )
                 }
               })}
@@ -225,17 +229,7 @@ function MeasurementsTab({ dryingGroup, sensors, measurementTypes, measurementUn
           }
 
 
-          {/* {filteredMeasurements ? 
-          {Object.keys(filteredMeasurements).map((key, index) => {
-              return(
-                
-                )
-            })} :
-              
-                
-          }
-            
-          })} */}
+        
           {/* <MultipleLineChartTemplate data1={filteredMeasurements[1]} data2={filteredMeasurements[2]} title={'Relative Humidity'} unit={measurementUnits[1]}></MultipleLineChartTemplate> */}
           {/* <MultipleLineChartTemplate data1={filteredMeasurements[3]} data2={filteredMeasurements[4]} title={'Absolute Humidity'} unit={measurementUnits[3]}></MultipleLineChartTemplate> */}
           {/* <MultipleLineChartTemplate data1={filteredMeasurements[5]} data2={filteredMeasurements[6]} title={'Temperature'} unit={measurementUnits[5]}></MultipleLineChartTemplate> */}
