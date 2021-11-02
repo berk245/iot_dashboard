@@ -5,6 +5,7 @@ import MultipleZoomChart from '../Charts/MultipleZoomChart'
 import SingleZoomChart from "../Charts/SingleZoomChart";
 import SensorsTable from "../Tables/SensorTable";
 
+
 const useStyles = makeStyles((theme) => ({
   chartsContainer: {
     marginTop: "5rem",
@@ -34,7 +35,9 @@ function MeasurementsTab({ dryingGroup, sensors, measurementTypes, measurementUn
   const [measurements, setMeasurements] = useState([]);
   const [selectedSensor, setSelectedSensor] = useState(sensors[0]);
   const [selectedDates, setSelectedDates] = useState({});
-  
+  const [filteredMeasurements, setFilteredMeasurements] = useState({})
+  const [measurementsFiltered, setMeasurementsFiltered] = useState(false)
+
   const [fetchError, setFetchError] = useState(false)
   //Initialize the default values
   useEffect(() => {
@@ -86,31 +89,39 @@ function MeasurementsTab({ dryingGroup, sensors, measurementTypes, measurementUn
     try {
       let response = await fetch(url);
       response = await response.json();
-      console.log(response.length)
       setMeasurements(JSON.parse(response))
-
-      return false;
     } catch (err) {
       console.log("failed: ", url);
-      console.log(
-        "Error while fetching measurements of drying group id:" + dryingGroup.id
-      );
       console.log(err);
       setFetchError(true)
     }
     return false
   };
  
+
+
   useEffect(() => {
     const measurementsInitializer = async() => {
-      // let measurementsAreBeingFetched = await getMeasurements(60, selectedDates.start_datetime, selectedDates.end_datetime) //Returns a boolean
-      // setLoading(measurementsAreBeingFetched)
+      await getMeasurements(60, selectedDates.start_datetime, selectedDates.end_datetime) //Returns a boolean
       setLoading(false)
     }
-
     measurementsInitializer()
    
-  }, [measurementUnits]);
+  }, [today]);
+
+  useEffect(() => {
+    let result = {}
+    for(let type of measurementTypes){
+      let filter = measurements.filter((m) => m.measurement_id === type.id)
+      result[type.name] = filter
+    }
+    setFilteredMeasurements(result)
+
+    if(measurements.length) setMeasurementsFiltered(true)
+  }, [measurements]);
+
+
+
 
   const handleSensorChange = (e) => {
     let selectedSensorId = (e.target.value)
@@ -136,10 +147,6 @@ function MeasurementsTab({ dryingGroup, sensors, measurementTypes, measurementUn
       setFetchError(true)
     }
   }
-
-  useEffect(() => {
-    console.log(selectedSensor.id, 'new sensor selected')
-  }, [selectedSensor]);
 
   const classes = useStyles();
   return (
@@ -197,11 +204,38 @@ function MeasurementsTab({ dryingGroup, sensors, measurementTypes, measurementUn
         {!fetchError&&
         <div className={classes.chartsContainer}>
           {/* <h4>{measurements[0].sensor_name} Measurements</h4> */}
-          <MultipleZoomChart/>
+          {/* <MultipleZoomChart/> */}
           <br />
           <br />
           <br />
-          <SingleZoomChart/>
+          {measurementsFiltered? 
+              <>
+              {Object.keys(filteredMeasurements).map((key,index) => {
+                if(filteredMeasurements[key].length){
+                  return(
+                    <SingleZoomChart key={index} title={key} data={filteredMeasurements[key]}/>
+                    )
+                }
+              })}
+              </>
+          :
+          <div style={{textAlign: 'center', paddingBottom:'5rem'}}>
+          <CircularProgress />
+          </div>
+          }
+
+
+          {/* {filteredMeasurements ? 
+          {Object.keys(filteredMeasurements).map((key, index) => {
+              return(
+                
+                )
+            })} :
+              
+                
+          }
+            
+          })} */}
           {/* <MultipleLineChartTemplate data1={filteredMeasurements[1]} data2={filteredMeasurements[2]} title={'Relative Humidity'} unit={measurementUnits[1]}></MultipleLineChartTemplate> */}
           {/* <MultipleLineChartTemplate data1={filteredMeasurements[3]} data2={filteredMeasurements[4]} title={'Absolute Humidity'} unit={measurementUnits[3]}></MultipleLineChartTemplate> */}
           {/* <MultipleLineChartTemplate data1={filteredMeasurements[5]} data2={filteredMeasurements[6]} title={'Temperature'} unit={measurementUnits[5]}></MultipleLineChartTemplate> */}

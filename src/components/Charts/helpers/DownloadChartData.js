@@ -1,26 +1,33 @@
 function DownloadChartData(data) {
 
-    let rows = []
+  let headers = Object.keys(data[0])
 
-    rows.push(['Name', 'Title2'])
+  console.log(headers);
 
-    data.map((measurement) => {
-        rows.push([measurement.name, measurement.cost])
-    })
 
-    console.log(rows)
+ let rows = [[...headers]]
 
-    let csvContent = "data:text/csv;charset=utf-8," 
-    + rows.map(e => e.join(",")).join("\n");
+ data.map((m) => {
+     let singleRow = []
+     headers.forEach(header =>{
+        singleRow.push(m[header])
+     })
+     rows.push(singleRow)
+ })
 
-    var encodedUri = encodeURI(csvContent);
-    var link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "data.csv");
-    document.body.appendChild(link); // Required for FF
 
-    link.click(); // This will download the data file named "my_data.csv".
 
+
+  let csvContent = "data:text/csv;charset=utf-8,"
+  + rows.map(e => e.join(",")).join("\n");
+
+  var encodedUri = encodeURI(csvContent);
+  var link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", "data.csv");
+  document.body.appendChild(link); // Required for FF
+
+  link.click(); // This will download the data file named "my_data.csv".
 }
 
-export default DownloadChartData
+export default DownloadChartData;
