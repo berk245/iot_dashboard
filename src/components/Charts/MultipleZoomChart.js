@@ -1,4 +1,5 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
+
 import {
   LineChart,
   Line,
@@ -7,74 +8,42 @@ import {
   CartesianGrid,
   Tooltip,
   ReferenceArea,
-  ReferenceDot,
 } from "recharts";
+import { ResponsiveContainer } from "recharts/lib/component/ResponsiveContainer";
+import DownloadChartData from "./helpers/DownloadChartData";
+import { Button } from "@material-ui/core";
 
-const initialData = [
-  { name: 2, cost: 12.39, impression: 14 },
-  { name: 3, cost: 12.37, impression: 13 },
-  { name: 4, cost: 13.16, impression: 13.1 },
-  { name: 5, cost: 12.29, impression: 12.7 },
-  { name: 6, cost: 13, impression: 13.9 },
-  { name: 7, cost: 12.53, impression: 14 },
-  { name: 8, cost: 12.52, impression: 13.5 },
-  { name: 9, cost: 12.79, impression: 13.7 },
-  { name: 10, cost: 12.94, impression: 12.9 },
-  { name: 11, cost: 12.94, impression: 12.9 },
-  { name: 12, cost: 14.11, impression: 15 },
-  { name: 13, cost: 12.39, impression: 14 },
-  { name: 14, cost: 12.37, impression: 13 },
-  { name: 15, cost: 12.79, impression: 13.7 },
-  { name: 16, cost: 12.94, impression: 12.9 },
-  { name: 17, cost: 14.11, impression: 15 },
-  { name: 18, cost: 12.39, impression: 14 },
-  { name: 19, cost: 12.37, impression: 13 },
-  { name: 20, cost: 13.16, impression: 13.1 },
-  { name: 21, cost: 12.29, impression: 12.7 },
-  { name: 22, cost: 13, impression: 13.9 },
-  { name: 23, cost: 12.53, impression: 14 },
-  { name: 24, cost: 12.52, impression: 13.5 },
-  { name: 25, cost: 13.16, impression: 13.1 },
-  { name: 26, cost: 12.29, impression: 12.7 },
-  { name: 27, cost: 13, impression: 13.9 },
-  { name: 28, cost: 12.53, impression: 14 },
-  { name: 29, cost: 12.52, impression: 13.5 },
-  { name: 30, cost: 12.79, impression: 13.7 },
-  { name: 31, cost: 12.94, impression: 12.9 },
-];
-
-const initialState = {
-  data: initialData,
-  left: "dataMin",
-  right: "dataMax",
-  refAreaLeft: "",
-  refAreaRight: "",
-  top: "dataMax+1",
-  bottom: "dataMin-1",
-  animation: true,
-};
-
-export default class App extends Component {
+export default class SingleZoomChart extends React.Component {
   constructor(props) {
     super(props);
-    this.state = initialState;
+    this.state = {
+      data: [...props.data.values],
+      left: "dataMin",
+      right: "dataMax",
+      refAreaLeft: "",
+      refAreaRight: "",
+      top: "dataMax+1",
+      bottom: "dataMin-1",
+      animation: true,
+    };
   }
 
   zoom() {
-    let { refAreaLeft, refAreaRight } = this.state;
-    const { data } = this.state;
+    let { refAreaLeft, refAreaRight, data } = this.state;
 
     if (refAreaLeft === refAreaRight || refAreaRight === "") {
-      this.setState(() => ({
+      this.setState({
         refAreaLeft: "",
         refAreaRight: "",
-      }));
+      });
+
       return;
     }
 
     // xAxis domain
-    if (refAreaLeft > refAreaRight)
+    if (refAreaLeft > refAreaRight) {
       [refAreaLeft, refAreaRight] = [refAreaRight, refAreaLeft];
+    }
 
     this.setState(() => ({
       refAreaLeft: "",
@@ -82,94 +51,151 @@ export default class App extends Component {
       data: data.slice(),
       left: refAreaLeft,
       right: refAreaRight,
-      top: "dataMax + 1",
       bottom: "dataMin - 1",
+      top: "dataMax + 1",
     }));
   }
 
-  zoomOut() {
-    const { data } = this.state;
-    this.setState(() => ({
-      data: data.slice(),
-      refAreaLeft: "",
-      refAreaRight: "",
-      left: "dataMin",
-      right: "dataMax",
-    }));
+  handleMouseDown(e) {
+    try {
+      this.setState({ refAreaLeft: e.activeLabel });
+    } catch {
+      console.log("Click out of bounds");
+    }
+  }
+
+  handleMouseMove(e) {
+    try {
+      this.state.refAreaLeft && this.setState({ refAreaRight: e.activeLabel });
+    } catch {
+      console.log("Click out of bounds");
+    }
+  }
+
+  formatXAxis(tickItem) {
+    // let label = new Date(tickItem).toLocaleDateString('de-DE') + ' ' + new Date(tickItem).toLocaleTimeString('de-DE')
+    // return label
+    let label = "";
+    let splited = tickItem.split(" ");
+    if (splited[1] == "01:00:00") {
+      label = splited[0];
+    }
+    return label;
+  }
+  
+  customYAxisTick(tick){
+    return(tick.toFixed(2))
+  }
+  customXAxisTick(tick){
+    console.log(tick.split(' ').join('\n'))
+    return tick.split(' ').join('\n')
   }
 
   render() {
     const { data, left, right, refAreaLeft, refAreaRight, top, bottom } =
       this.state;
 
-
+    console.log(this.props)
     return (
-      <div className="highlight-bar-charts" style={{ userSelect: "none" }}>
-        <LineChart
-          width={800}
-          height={400}
-          data={data}
-          onMouseDown={(e) =>
-            this.setState({
-              refAreaLeft: e.activeLabel,
-              refAreaRight: e.activeLabel,
-            })
-          }
-          onMouseMove={(e) =>
-            this.state.refAreaLeft &&
-            this.setState({ refAreaRight: e.activeLabel })
-          }
-          onMouseUp={this.zoom.bind(this)}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis
-            allowDataOverflow
-            dataKey="name"
-            domain={[left, right]}
-            type="number"
-          />
-          <YAxis
-            allowDataOverflow
-            domain={[bottom, top]}
-            type="number"
-            yAxisId="1"
-          />
+      <>
+        {data && (
+          <div className="highlight-bar-charts" style={{ userSelect: "none" }}>
+            <div style={{marginBottom: '1rem'}}>
+            <p style={{fontSize: '1.1rem', fontWeight: 600, marginLeft: '2rem'}}>{this.props.data.kpi.toUpperCase()}</p>
+            <div style={{ display:'inline-block', width:'70%', marginLeft:'2rem', marginBottom:'1rem' }}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  style={{
+                    borderColor: "#8884d8",
+                    fontSize:'0.75rem',
+                    padding:'0.1rem 0.5rem',
+                    color: "#8884d8",
+                    fontWeight: 600,
+                    borderWidth: '2px',
+                    textTransform: 'none'
+                  }}
+                  onClick={() => {
+                    DownloadChartData(data);
+                  }}
+                >
+                  Download as CSV
+                </Button>
+              </div>
+              </div>
+            <ResponsiveContainer width="90%" height={400}>
+              <LineChart
+                data={data}
+                onMouseDown={(e) => this.handleMouseDown(e)}
+                onMouseMove={(e) => this.handleMouseMove(e)}
+                // eslint-disable-next-line react/jsx-no-bind
+                onMouseUp={this.zoom.bind(this)}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  height={100}
+                  tickMargin={20}
+                  angle={-10}
+                  padding={{ left: 50, right: 50 }}
+                  interval={100}
+                  allowDataOverflow
+                  domain={[left, right]}
+                  dataKey="timestamp"
+                  tickFormatter={this.customXAxisTick}
+                />
+                <YAxis
+                  allowDataOverflow
+                  domain={[bottom, top]}
+                  tickFormatter={this.customYAxisTick}
+                  tickCount={20}
+                  
+                  padding={{top: 10, bottom: 20}}
+                  type="number"
+                  yAxisId="1"
+                  width={120}
+                />
+                <Tooltip />
+                <Line
+                  dot={false}
+                  strokeWidth={2}
+                  yAxisId="1"
+                  type="natural"
+                  dataKey="data1"
+                  stroke="#8884d8"
+                  animationDuration={300}
+                />
+                <Line
+                  yAxisId="1"
+                  dot={false}
+                  strokeWidth={2}
+                  type="natural"
+                  dataKey="data2"
+                  stroke="#AB003C"
+                  animationDuration={300}
+                />
+                {refAreaLeft && refAreaRight ? (
+                  <ReferenceArea
+                    yAxisId="1"
+                    x1={refAreaLeft}
+                    x2={refAreaRight}
+                    strokeOpacity={0.3}
+                  />
+                ) : null}
+              </LineChart>
+            </ResponsiveContainer>
 
-          <Tooltip />
-          <Line
-            yAxisId="1"
-            type="natural"
-            dataKey="cost"
-            stroke="#8884d8"
-            animationDuration={300}
-          />
-          <Line
-            yAxisId="1"
-            type="natural"
-            dataKey="impression"
-            stroke="#82ca9d"
-            animationDuration={300}
-          />
-          <ReferenceDot></ReferenceDot>
-          {refAreaLeft ? (
-            <ReferenceArea
-              yAxisId="1"
-              x1={refAreaLeft}
-              x2={refAreaRight}
-              strokeOpacity={0.2}
-            />
-          ) : null}
-        </LineChart>
-        {left !== "dataMin" && (
-          <button
-            type="button"
-            className="btn update"
-            onClick={this.zoomOut.bind(this)}
-          >
-            Zoom Out
-          </button>
+            {/* {left !== "dataMin" && (
+              <button
+                type="button"
+                className="btn update"
+                onClick={this.zoomOut.bind(this)}
+              >
+                Zoom Out
+              </button>
+            )} */}
+          </div>
         )}
-      </div>
+      </>
     );
   }
 }

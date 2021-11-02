@@ -66,19 +66,20 @@ function MeasurementsTab({
     setDefaultStartEndDates();
   }, []);
 
-  const getMeasurements = async (agg, start, end) => {
+  const getMeasurements = async (agg, sensor_id, start, end) => {
     setFetchError(false);
     if (!start || !end) return true;
 
     let url =
-      "https://api.smartdrying.io/measurement/aggregated/get/drying_group/" +
+      "https://api.smartdrying.io/measurement/aggregated/charts/get/drying_group/" +
       dryingGroup.id;
     url += `?aggregation_minutes=${agg}`;
+    url += `&sensor_id=${sensor_id}`;
     url += `&start_datetime=${start}`;
     url += `&end_datetime=${end}`;
-
     try {
       let response = await fetch(url);
+      console.log(response, typeof response)
       response = await response.json();
       setMeasurements(JSON.parse(response));
     } catch (err) {
@@ -94,6 +95,7 @@ function MeasurementsTab({
       try{
         await getMeasurements(
           60,
+          selectedSensor.id,
           selectedDates.start_datetime,
           selectedDates.end_datetime
         ); //Returns a boolean
@@ -106,28 +108,13 @@ function MeasurementsTab({
     measurementsInitializer();
   }, [today]);
 
-  useEffect(() => {
-    const groupMeasurementsByType = () => {
-      let result = {};
-      for (let type of measurementTypes) {
-        let filter = measurements.filter((m) => m.measurement_id === type.id);
-        result[type.name] = filter;
-      }
-      setGroupedMeasurements(result);
-      if (measurements.length) setMeasurementsGrouped(true);
-    };
-
-    groupMeasurementsByType();
-  }, [measurements]);
-
-
-
-  const requestNewCharts = async (agg, start,end) => {
+  const requestNewCharts = async (agg, id, start,end) => {
     setLoading(true);
     try {
       setLoading(
         await getMeasurements(
           agg,
+          id,
           start,
           end
         )
@@ -177,31 +164,30 @@ function MeasurementsTab({
                 </>
               )}
               {measurements.length?
-              <>
-              {measurementsGrouped ? (
+              
                 <>
-                  {Object.keys(groupedMeasurements).map((key, index) => {
-                    if (groupedMeasurements[key].length) {
-                      return (
-                        <SingleZoomChart
-                          key={index}
-                          title={key}
-                          data={groupedMeasurements[key]}
-                        />
-                      );
-                    }
-                  })}
+                 {measurements.map((m, idx) => {
+                   if(m.labels.data2){
+                     return(
+                      <MultipleZoomChart
+                      key={idx}
+                      data={m}/> 
+                     ) 
+                    
+                   }else{
+                     return (
+                      <SingleZoomChart
+                        key={idx}
+                        data={m}/> 
+                     )
+                   }
+                 })}                               
                 </>
-              ) : (
+                :
                 <div style={{ textAlign: "center", paddingBottom: "5rem" }}>
-                  <CircularProgress />
-                </div>
-              )
-              }
-              </>
-              :
-               <p style={{textAlign: 'center'}}>No measurements available for this sensor in the selected dates</p>
-            }
+                <CircularProgress />
+              </div>
+}
               {/* <MultipleLineChartTemplate data1={filteredMeasurements[1]} data2={filteredMeasurements[2]} title={'Relative Humidity'} unit={measurementUnits[1]}></MultipleLineChartTemplate> */}
               {/* <MultipleLineChartTemplate data1={filteredMeasurements[3]} data2={filteredMeasurements[4]} title={'Absolute Humidity'} unit={measurementUnits[3]}></MultipleLineChartTemplate> */}
               {/* <MultipleLineChartTemplate data1={filteredMeasurements[5]} data2={filteredMeasurements[6]} title={'Temperature'} unit={measurementUnits[5]}></MultipleLineChartTemplate> */}

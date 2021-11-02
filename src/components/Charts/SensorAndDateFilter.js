@@ -104,7 +104,7 @@ function SensorAndDateFilter({
       <div className={classes.submitSection}>
         <Button
           variant="outlined"
-          onClick={()=> {requestNewCharts(60, selectedDates.start_datetime, selectedDates.end_datetime)}}
+          onClick={()=> {requestNewCharts(60, selectedSensor.id, selectedDates.start_datetime, selectedDates.end_datetime)}}
         style={{ padding: "0.95rem", background: '#002884c7', color: 'white' }}
         >
           Submit

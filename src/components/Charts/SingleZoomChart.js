@@ -17,7 +17,7 @@ export default class SingleZoomChart extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: [...props.data],
+      data: [...props.data.values],
       left: "dataMin",
       right: "dataMax",
       refAreaLeft: "",
@@ -27,17 +27,6 @@ export default class SingleZoomChart extends React.Component {
       animation: true,
     };
   }
-  // addTimestamps(arr){
-  //   let result = []
-
-  //   arr.map(item => {
-  //     let timestamp = new Date(item.measurement_interval).getTime()
-  //     if(1634610000 < timestamp < 1634750000) console.log(timestamp,item.measurement_interval)
-  //     let newItem = {...item, timestamp: timestamp}
-  //     result.push(newItem)
-  //   })
-  //   return(result)
-  // }
 
   zoom() {
     let { refAreaLeft, refAreaRight, data } = this.state;
@@ -93,32 +82,44 @@ export default class SingleZoomChart extends React.Component {
     }
     return label;
   }
+  
+  customYAxisTick(tick){
+    return(tick.toFixed(1))
+  }
+  customXAxisTick(tick){
+    console.log(tick.split(' ').join('\n'))
+    return tick.split(' ').join('\n')
+  }
 
   render() {
     const { data, left, right, refAreaLeft, refAreaRight, top, bottom } =
       this.state;
 
+    console.log(this.props)
     return (
       <>
         {data && (
           <div className="highlight-bar-charts" style={{ userSelect: "none" }}>
             <div style={{marginBottom: '1rem'}}>
-            <span style={{fontSize: '1.1rem', fontWeight: 600, marginLeft: '2rem'}}>{this.props.title.toUpperCase()}</span>
-            <div style={{ display:'inline-block', width:'70%', textAlign:'right', marginBottom:'1rem' }}>
+            <p style={{fontSize: '1.1rem', fontWeight: 600, marginLeft: '2rem'}}>{this.props.data.kpi.toUpperCase()}</p>
+            <div style={{ display:'inline-block', width:'70%', marginLeft:'2rem', marginBottom:'1rem' }}>
                 <Button
                   variant="outlined"
                   size="small"
                   style={{
                     borderColor: "#8884d8",
+                    fontSize:'0.75rem',
+                    padding:'0.1rem 0.5rem',
                     color: "#8884d8",
                     fontWeight: 600,
-                    borderWidth: '2px'
+                    borderWidth: '2px',
+                    textTransform: 'none'
                   }}
                   onClick={() => {
                     DownloadChartData(data);
                   }}
                 >
-                  Download Chart Data as CSV
+                  Download as CSV
                 </Button>
               </div>
               </div>
@@ -139,11 +140,16 @@ export default class SingleZoomChart extends React.Component {
                   interval={100}
                   allowDataOverflow
                   domain={[left, right]}
-                  dataKey="measurement_interval"
+                  dataKey="timestamp"
+                  tickFormatter={this.customXAxisTick}
                 />
                 <YAxis
                   allowDataOverflow
                   domain={[bottom, top]}
+                  tickFormatter={this.customYAxisTick}
+                  tickCount={10}
+                  interval={1}
+                  padding={{top: 10, bottom: 20}}
                   type="number"
                   yAxisId="1"
                   width={120}
@@ -152,7 +158,9 @@ export default class SingleZoomChart extends React.Component {
                 <Line
                   yAxisId="1"
                   type="natural"
-                  dataKey="avg_measurement_value"
+                  dot={false}
+                  strokeWidth={2}
+                  dataKey="data1"
                   stroke="#8884d8"
                   animationDuration={300}
                 />
