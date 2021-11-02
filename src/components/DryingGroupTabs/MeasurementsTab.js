@@ -1,44 +1,49 @@
 import React, { useState, useEffect } from "react";
-import { CircularProgress,TextField, Button } from "@material-ui/core";
+import { CircularProgress, TextField, Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
-import MultipleZoomChart from '../Charts/MultipleZoomChart'
+import MultipleZoomChart from "../Charts/MultipleZoomChart";
 import SingleZoomChart from "../Charts/SingleZoomChart";
+import TemplateChart from "../Charts/TemplateChart";
 import SensorsTable from "../Tables/SensorTable";
-
 
 const useStyles = makeStyles((theme) => ({
   chartsContainer: {
-    marginTop: "5rem",
+    marginTop: "1rem",
   },
-  measurementParametersSection:{
-    display: 'flex',
-    justifyContent: 'space-around',
-    margin: '2rem 0'
+  measurementParametersSection: {
+    display: "flex",
+    justifyContent: "space-around",
+    margin: "2rem 0",
   },
-  sensorSelector:{
-    flexBasis: '25%',
-    padding:'1rem',
-    borderRadius: '5px',
-    margin: '0.5rem 1rem',
-    background: 'white'
+  sensorSelector: {
+    flexBasis: "25%",
+    padding: "1rem",
+    borderRadius: "5px",
+    margin: "0.5rem 1rem",
+    background: "white",
   },
-  textField:{
-    width:'45%',
-    marginLeft: '1rem'
+  textField: {
+    width: "45%",
+    marginLeft: "1rem",
   },
-  
 }));
 
-function MeasurementsTab({ dryingGroup, sensors, measurementTypes, measurementUnits }) {
+function MeasurementsTab({
+  dryingGroup,
+  sensors,
+  measurementTypes,
+  measurementUnits,
+}) {
   const [today, setToday] = useState("");
   const [loading, setLoading] = useState(true);
   const [measurements, setMeasurements] = useState([]);
   const [selectedSensor, setSelectedSensor] = useState(sensors[0]);
   const [selectedDates, setSelectedDates] = useState({});
-  const [groupedMeasurements, setGroupedMeasurements] = useState({})
-  const [measurementsGrouped, setMeasurementsGrouped] = useState(false)
+  const [groupedMeasurements, setGroupedMeasurements] = useState({});
+  const [measurementsGrouped, setMeasurementsGrouped] = useState(false);
+  const [seeExample, setSeeExample] = useState(false);
 
-  const [fetchError, setFetchError] = useState(false)
+  const [fetchError, setFetchError] = useState(false);
   //Initialize the default values
   useEffect(() => {
     const getToday = () => {
@@ -71,14 +76,12 @@ function MeasurementsTab({ dryingGroup, sensors, measurementTypes, measurementUn
     };
     getToday();
     setDefaultStartEndDates();
-    
-
   }, []);
 
   const getMeasurements = async (agg, start, end) => {
-    setFetchError(false)
-    if(!start || !end ) return true
-    
+    setFetchError(false);
+    if (!start || !end) return true;
+
     let url =
       "https://api.smartdrying.io/measurement/aggregated/get/drying_group/" +
       dryingGroup.id;
@@ -89,68 +92,71 @@ function MeasurementsTab({ dryingGroup, sensors, measurementTypes, measurementUn
     try {
       let response = await fetch(url);
       response = await response.json();
-      setMeasurements(JSON.parse(response))
+      setMeasurements(JSON.parse(response));
     } catch (err) {
       console.log("failed: ", url);
       console.log(err);
-      setFetchError(true)
+      setFetchError(true);
     }
-    return false
+    return false;
   };
- 
-
 
   useEffect(() => {
-    const measurementsInitializer = async() => {
-      await getMeasurements(60, selectedDates.start_datetime, selectedDates.end_datetime) //Returns a boolean
-      setLoading(false)
-    }
-    measurementsInitializer()
-   
+    const measurementsInitializer = async () => {
+      await getMeasurements(
+        60,
+        selectedDates.start_datetime,
+        selectedDates.end_datetime
+      ); //Returns a boolean
+      setLoading(false);
+    };
+    measurementsInitializer();
   }, [today]);
 
   useEffect(() => {
-    const groupMeasurementsByType = () =>{
-      let result = {}
-      for(let type of measurementTypes){
-        let filter = measurements.filter((m) => m.measurement_id === type.id)
-        result[type.name] = filter
+    const groupMeasurementsByType = () => {
+      let result = {};
+      for (let type of measurementTypes) {
+        let filter = measurements.filter((m) => m.measurement_id === type.id);
+        result[type.name] = filter;
       }
-      setGroupedMeasurements(result)
-      if(measurements.length) setMeasurementsGrouped(true)
-    }
-      
-    groupMeasurementsByType()
+      setGroupedMeasurements(result);
+      if (measurements.length) setMeasurementsGrouped(true);
+    };
 
+    groupMeasurementsByType();
   }, [measurements]);
 
-
-
-
   const handleSensorChange = (e) => {
-    let selectedSensorId = (e.target.value)
+    let selectedSensorId = e.target.value;
     sensors.map((s) => {
-      if(parseInt(s.id) === parseInt(selectedSensorId)){
-        setSelectedSensor(s)
+      if (parseInt(s.id) === parseInt(selectedSensorId)) {
+        setSelectedSensor(s);
       }
-    })
-  }
+    });
+  };
   const handleDateChange = (e) => {
-    const {name, value} = e.target
-    let obj = {...selectedDates}
+    const { name, value } = e.target;
+    let obj = { ...selectedDates };
     obj[name] = value;
-    setSelectedDates(obj)
-  }
-  
-  const requestNewCharts = async() =>{
-    setLoading(true)
-    try{
-      setLoading(await getMeasurements(60, selectedDates.start_datetime, selectedDates.end_datetime))
-    }catch(err){
-      console.log(err)
-      setFetchError(true)
+    setSelectedDates(obj);
+  };
+
+  const requestNewCharts = async () => {
+    setLoading(true);
+    try {
+      setLoading(
+        await getMeasurements(
+          60,
+          selectedDates.start_datetime,
+          selectedDates.end_datetime
+        )
+      );
+    } catch (err) {
+      console.log(err);
+      setFetchError(true);
     }
-  }
+  };
 
   const classes = useStyles();
   return (
@@ -164,87 +170,117 @@ function MeasurementsTab({ dryingGroup, sensors, measurementTypes, measurementUn
 
       {!loading && (
         <>
-        {sensors.length && 
-          <SensorsTable sensors={sensors} />
-        }
-        <div className={classes.measurementParametersSection}>
-          <div className={classes.sensorSelectSection}>
-        <span>Sensor:</span>
-        <select className={classes.sensorSelector}  placeholder='Choose a sensor' onChange={handleSensorChange}>
-          {sensors.map((sensor, index) => {
-            return(
-            <option value={sensor.id} id={sensor.internal_name} key={index}>{sensor.internal_name} / {sensor.id}</option>
-            )
-          })}
-        </select>
-        </div>
-        <div className={classes.dateSelectSection}>
-        <TextField
-        label="Start Date"
-        name="start_datetime"
-        variant="outlined"
-        defaultValue={selectedDates.start_datetime}
-        onChange={(e) => handleDateChange(e)}
-        className={classes.textField}
-        helperText='Format: YYYY-MM-DD HH:MM:SS'
-        />
-        <TextField
-        label="End Date"
-        name="end_datetime"
-        variant="outlined"
-        defaultValue={selectedDates.end_datetime}
-        onChange={(e) => handleDateChange(e)}
-        className={classes.textField}
-        />
-        </div>
-        <div className={classes.submitSection}>
-          <Button
-            variant='outlined'
-            onClick={requestNewCharts}
-            style={{padding: '0.95rem'}}
-          >Submit</Button>
-        </div>
-        </div>
-        {!fetchError&&
-        <div className={classes.chartsContainer}>
-          {/* <h4>{measurements[0].sensor_name} Measurements</h4> */}
-          {/* <MultipleZoomChart/> */}
-          <br />
-          <br />
-          <br />
-          {measurementsGrouped? 
-              <>
-              {Object.keys(groupedMeasurements).map((key,index) => {
-                if(groupedMeasurements[key].length){
-                  return(
-                    <SingleZoomChart key={index} title={key} data={groupedMeasurements[key]}/>
-                    )
-                }
-              })}
-              </>
-          :
-          <div style={{textAlign: 'center', paddingBottom:'5rem'}}>
-          <CircularProgress />
+          {sensors.length && <SensorsTable sensors={sensors} />}
+          <div className={classes.measurementParametersSection}>
+            <div className={classes.sensorSelectSection}>
+              <span>Sensor:</span>
+              <select
+                className={classes.sensorSelector}
+                placeholder="Choose a sensor"
+                onChange={handleSensorChange}
+              >
+                {sensors.map((sensor, index) => {
+                  return (
+                    <option
+                      value={sensor.id}
+                      id={sensor.internal_name}
+                      key={index}
+                    >
+                      {sensor.internal_name} / {sensor.id}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+            <div className={classes.dateSelectSection}>
+              <TextField
+                label="Start Date"
+                name="start_datetime"
+                variant="outlined"
+                defaultValue={selectedDates.start_datetime}
+                onChange={(e) => handleDateChange(e)}
+                className={classes.textField}
+                helperText="Format: YYYY-MM-DD HH:MM:SS"
+              />
+              <TextField
+                label="End Date"
+                name="end_datetime"
+                variant="outlined"
+                defaultValue={selectedDates.end_datetime}
+                onChange={(e) => handleDateChange(e)}
+                className={classes.textField}
+              />
+            </div>
+            <div className={classes.submitSection}>
+              <Button
+                variant="outlined"
+                onClick={requestNewCharts}
+                style={{ padding: "0.95rem" }}
+              >
+                Submit
+              </Button>
+            </div>
           </div>
-          }
-
-
-        
-          {/* <MultipleLineChartTemplate data1={filteredMeasurements[1]} data2={filteredMeasurements[2]} title={'Relative Humidity'} unit={measurementUnits[1]}></MultipleLineChartTemplate> */}
-          {/* <MultipleLineChartTemplate data1={filteredMeasurements[3]} data2={filteredMeasurements[4]} title={'Absolute Humidity'} unit={measurementUnits[3]}></MultipleLineChartTemplate> */}
-          {/* <MultipleLineChartTemplate data1={filteredMeasurements[5]} data2={filteredMeasurements[6]} title={'Temperature'} unit={measurementUnits[5]}></MultipleLineChartTemplate> */}
-          {/* <SingleLineChartTemplate data={filteredMeasurements[7]} title={'Pressure'} unit={measurementUnits[7]}></SingleLineChartTemplate> */}{" "}
-          
-          {/* <SingleLineChartTemplate data={filteredMeasurements[1]} title={'Relative Humidity External'} unit={measurementUnits[1]}></SingleLineChartTemplate>
+          {!fetchError && (
+            <div className={classes.chartsContainer}>
+              {/* <h4>{measurements[0].sensor_name} Measurements</h4> */}
+              {/* <MultipleZoomChart/> */}
+              {!seeExample ? (
+                <Button
+                  variant="outlined"
+                  style={{ margin: "1rem" }}
+                  onClick={() => setSeeExample(!seeExample)}
+                >
+                  See zoom chart example
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    variant="outlined"
+                    style={{ margin: "1rem" }}
+                    onClick={() => setSeeExample(!seeExample)}
+                  >
+                    Close zoom chart example
+                  </Button>
+                  <TemplateChart></TemplateChart>
+                </>
+              )}
+              {measurementsGrouped ? (
+                <>
+                  {Object.keys(groupedMeasurements).map((key, index) => {
+                    if (groupedMeasurements[key].length) {
+                      return (
+                        <SingleZoomChart
+                          key={index}
+                          title={key}
+                          data={groupedMeasurements[key]}
+                        />
+                      );
+                    }
+                  })}
+                </>
+              ) : (
+                <div style={{ textAlign: "center", paddingBottom: "5rem" }}>
+                  <CircularProgress />
+                </div>
+              )}
+              {/* <MultipleLineChartTemplate data1={filteredMeasurements[1]} data2={filteredMeasurements[2]} title={'Relative Humidity'} unit={measurementUnits[1]}></MultipleLineChartTemplate> */}
+              {/* <MultipleLineChartTemplate data1={filteredMeasurements[3]} data2={filteredMeasurements[4]} title={'Absolute Humidity'} unit={measurementUnits[3]}></MultipleLineChartTemplate> */}
+              {/* <MultipleLineChartTemplate data1={filteredMeasurements[5]} data2={filteredMeasurements[6]} title={'Temperature'} unit={measurementUnits[5]}></MultipleLineChartTemplate> */}
+              {/* <SingleLineChartTemplate data={filteredMeasurements[7]} title={'Pressure'} unit={measurementUnits[7]}></SingleLineChartTemplate> */}{" "}
+              {/* <SingleLineChartTemplate data={filteredMeasurements[1]} title={'Relative Humidity External'} unit={measurementUnits[1]}></SingleLineChartTemplate>
             <SingleLineChartTemplate data={filteredMeasurements[3]} title={'Absolute Humidty External'} unit={measurementUnits[3]}></SingleLineChartTemplate>
             <SingleLineChartTemplate data={filteredMeasurements[4]} title={'Absolute Humidty Pipe'} unit={measurementUnits[4]}></SingleLineChartTemplate>
             <SingleLineChartTemplate data={filteredMeasurements[5]} title={'Temperature External'} unit={measurementUnits[5]}></SingleLineChartTemplate>
             <SingleLineChartTemplate data={filteredMeasurements[6]} title={'Temperature Pipe'} unit={measurementUnits[6]}></SingleLineChartTemplate> */}
-        </div>
-        }
-        {fetchError && 
-          <h5>An error occured while fetching data. Please make sure that the search parameters (eg, dates) are in correct format and try again.</h5>
-        }
+            </div>
+          )}
+          {fetchError && (
+            <h5>
+              An error occured while fetching data. Please make sure that the
+              search parameters (eg, dates) are in correct format and try again.
+            </h5>
+          )}
         </>
       )}
     </div>
