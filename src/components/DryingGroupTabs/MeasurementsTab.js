@@ -5,22 +5,10 @@ import MultipleZoomChart from "../Charts/MultipleZoomChart";
 import SingleZoomChart from "../Charts/SingleZoomChart";
 import TemplateChart from "../Charts/TemplateChart";
 import SensorsTable from "../Tables/SensorTable";
-
+import SensorAndDateFilter from '../Charts/SensorAndDateFilter'
 const useStyles = makeStyles((theme) => ({
   chartsContainer: {
     marginTop: "1rem",
-  },
-  measurementParametersSection: {
-    display: "flex",
-    justifyContent: "space-around",
-    margin: "2rem 0",
-  },
-  sensorSelector: {
-    flexBasis: "25%",
-    padding: "1rem",
-    borderRadius: "5px",
-    margin: "0.5rem 1rem",
-    background: "white",
   },
   textField: {
     width: "45%",
@@ -34,11 +22,11 @@ function MeasurementsTab({
   measurementTypes,
   measurementUnits,
 }) {
+  const [selectedDates, setSelectedDates] = useState()
   const [today, setToday] = useState("");
   const [loading, setLoading] = useState(true);
   const [measurements, setMeasurements] = useState([]);
   const [selectedSensor, setSelectedSensor] = useState(sensors[0]);
-  const [selectedDates, setSelectedDates] = useState({});
   const [groupedMeasurements, setGroupedMeasurements] = useState({});
   const [measurementsGrouped, setMeasurementsGrouped] = useState(false);
   const [seeExample, setSeeExample] = useState(false);
@@ -103,12 +91,17 @@ function MeasurementsTab({
 
   useEffect(() => {
     const measurementsInitializer = async () => {
-      await getMeasurements(
-        60,
-        selectedDates.start_datetime,
-        selectedDates.end_datetime
-      ); //Returns a boolean
-      setLoading(false);
+      try{
+        await getMeasurements(
+          60,
+          selectedDates.start_datetime,
+          selectedDates.end_datetime
+        ); //Returns a boolean
+        setLoading(false);
+      }catch{
+        console.log('Dates not set')
+      }
+      
     };
     measurementsInitializer();
   }, [today]);
@@ -127,29 +120,16 @@ function MeasurementsTab({
     groupMeasurementsByType();
   }, [measurements]);
 
-  const handleSensorChange = (e) => {
-    let selectedSensorId = e.target.value;
-    sensors.map((s) => {
-      if (parseInt(s.id) === parseInt(selectedSensorId)) {
-        setSelectedSensor(s);
-      }
-    });
-  };
-  const handleDateChange = (e) => {
-    const { name, value } = e.target;
-    let obj = { ...selectedDates };
-    obj[name] = value;
-    setSelectedDates(obj);
-  };
 
-  const requestNewCharts = async () => {
+
+  const requestNewCharts = async (agg, start,end) => {
     setLoading(true);
     try {
       setLoading(
         await getMeasurements(
-          60,
-          selectedDates.start_datetime,
-          selectedDates.end_datetime
+          agg,
+          start,
+          end
         )
       );
     } catch (err) {
@@ -171,56 +151,7 @@ function MeasurementsTab({
       {!loading && (
         <>
           {sensors.length && <SensorsTable sensors={sensors} />}
-          <div className={classes.measurementParametersSection}>
-            <div className={classes.sensorSelectSection}>
-              <span>Sensor:</span>
-              <select
-                className={classes.sensorSelector}
-                placeholder="Choose a sensor"
-                onChange={handleSensorChange}
-              >
-                {sensors.map((sensor, index) => {
-                  return (
-                    <option
-                      value={sensor.id}
-                      id={sensor.internal_name}
-                      key={index}
-                    >
-                      {sensor.internal_name} / {sensor.id}
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
-            <div className={classes.dateSelectSection}>
-              <TextField
-                label="Start Date"
-                name="start_datetime"
-                variant="outlined"
-                defaultValue={selectedDates.start_datetime}
-                onChange={(e) => handleDateChange(e)}
-                className={classes.textField}
-                helperText="Format: YYYY-MM-DD HH:MM:SS"
-              />
-              <TextField
-                label="End Date"
-                name="end_datetime"
-                variant="outlined"
-                defaultValue={selectedDates.end_datetime}
-                onChange={(e) => handleDateChange(e)}
-                className={classes.textField}
-              />
-            </div>
-            <div className={classes.submitSection}>
-              <Button
-                variant="outlined"
-                onClick={requestNewCharts}
-                style={{ padding: "0.95rem" }}
-              >
-                Submit
-              </Button>
-            </div>
-          </div>
+          <SensorAndDateFilter sensors={sensors} selectedSensor={selectedSensor} selectedDates={selectedDates} setSelectedDates={setSelectedDates} setSelectedSensor={setSelectedSensor} requestNewCharts={requestNewCharts}/>
           {!fetchError && (
             <div className={classes.chartsContainer}>
               {/* <h4>{measurements[0].sensor_name} Measurements</h4> */}
@@ -245,6 +176,8 @@ function MeasurementsTab({
                   <TemplateChart></TemplateChart>
                 </>
               )}
+              {measurements.length?
+              <>
               {measurementsGrouped ? (
                 <>
                   {Object.keys(groupedMeasurements).map((key, index) => {
@@ -263,7 +196,12 @@ function MeasurementsTab({
                 <div style={{ textAlign: "center", paddingBottom: "5rem" }}>
                   <CircularProgress />
                 </div>
-              )}
+              )
+              }
+              </>
+              :
+               <p style={{textAlign: 'center'}}>No measurements available for this sensor in the selected dates</p>
+            }
               {/* <MultipleLineChartTemplate data1={filteredMeasurements[1]} data2={filteredMeasurements[2]} title={'Relative Humidity'} unit={measurementUnits[1]}></MultipleLineChartTemplate> */}
               {/* <MultipleLineChartTemplate data1={filteredMeasurements[3]} data2={filteredMeasurements[4]} title={'Absolute Humidity'} unit={measurementUnits[3]}></MultipleLineChartTemplate> */}
               {/* <MultipleLineChartTemplate data1={filteredMeasurements[5]} data2={filteredMeasurements[6]} title={'Temperature'} unit={measurementUnits[5]}></MultipleLineChartTemplate> */}

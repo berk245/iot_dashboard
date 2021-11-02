@@ -102,9 +102,9 @@ export default class SingleZoomChart extends React.Component {
       <>
         {data && (
           <div className="highlight-bar-charts" style={{ userSelect: "none" }}>
-            <div style={{marginBottom: '1.25rem'}}>
+            <div style={{marginBottom: '1rem'}}>
             <span style={{fontSize: '1.1rem', fontWeight: 600, marginLeft: '2rem'}}>{this.props.title.toUpperCase()}</span>
-            <div style={{ display:'inline-block', width:'75%', textAlign:'right', marginBottom:'1rem' }}>
+            <div style={{ display:'inline-block', width:'70%', textAlign:'right', marginBottom:'1rem' }}>
                 <Button
                   variant="outlined"
                   size="small"
@@ -122,7 +122,7 @@ export default class SingleZoomChart extends React.Component {
                 </Button>
               </div>
               </div>
-            <ResponsiveContainer width="85%" height={450}>
+            <ResponsiveContainer width="90%" height={450}>
               <LineChart
                 data={data}
                 onMouseDown={(e) => this.handleMouseDown(e)}
