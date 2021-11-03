@@ -8,10 +8,16 @@ import {
   CartesianGrid,
   Tooltip,
   ReferenceArea,
+  Legend
 } from "recharts";
 import { ResponsiveContainer } from "recharts/lib/component/ResponsiveContainer";
 import DownloadChartData from "./helpers/DownloadChartData";
 import { Button } from "@material-ui/core";
+
+
+
+
+
 
 export default class SingleZoomChart extends React.Component {
   constructor(props) {
@@ -23,7 +29,9 @@ export default class SingleZoomChart extends React.Component {
       refAreaLeft: "",
       refAreaRight: "",
       animation: true,
+      labels: props.data.labels,
     };
+      
   }
 
   zoom() {
@@ -81,17 +89,19 @@ export default class SingleZoomChart extends React.Component {
 
 
 
-
   customXAxisTick(tick){
-    console.log(tick.split(' ').join('\n'))
     return tick.split(' ').join('\n')
+  }
+
+  legendFormatter = (value, entry, index) => {
+    let splitted = this.state.labels[value].split('_')
+    return splitted[splitted.length -1]
   }
 
   render() {
     const { data, left, right, refAreaLeft, refAreaRight } =
       this.state;
 
-    console.log(this.props)
     return (
       <>
         {data && (
@@ -138,6 +148,7 @@ export default class SingleZoomChart extends React.Component {
                   domain={[left, right]}
                   dataKey="timestamp"
                   tickFormatter={this.customXAxisTick}
+
                 />
                 <YAxis
                   allowDataOverflow
@@ -155,6 +166,7 @@ export default class SingleZoomChart extends React.Component {
                   yAxisId="1"
                   type="natural"
                   dataKey="data1"
+                  label={false}
                   stroke="#8884d8"
                   animationDuration={300}
                 />
@@ -164,9 +176,11 @@ export default class SingleZoomChart extends React.Component {
                   strokeWidth={2}
                   type="natural"
                   dataKey="data2"
+                  label={false}
                   stroke="#AB003C"
                   animationDuration={300}
                 />
+                <Legend formatter={this.legendFormatter}/>
                 {refAreaLeft && refAreaRight ? (
                   <ReferenceArea
                     yAxisId="1"
