@@ -22,8 +22,6 @@ export default class SingleZoomChart extends React.Component {
       right: "dataMax",
       refAreaLeft: "",
       refAreaRight: "",
-      top: "dataMax+1",
-      bottom: "dataMin-1",
       animation: true,
     };
   }
@@ -51,8 +49,6 @@ export default class SingleZoomChart extends React.Component {
       data: data.slice(),
       left: refAreaLeft,
       right: refAreaRight,
-      bottom: "dataMin - 1",
-      top: "dataMax + 1",
     }));
   }
 
@@ -82,17 +78,17 @@ export default class SingleZoomChart extends React.Component {
     }
     return label;
   }
-  
-  customYAxisTick(tick){
-    return(tick.toFixed(2))
-  }
+
+
+
+
   customXAxisTick(tick){
     console.log(tick.split(' ').join('\n'))
     return tick.split(' ').join('\n')
   }
 
   render() {
-    const { data, left, right, refAreaLeft, refAreaRight, top, bottom } =
+    const { data, left, right, refAreaLeft, refAreaRight } =
       this.state;
 
     console.log(this.props)
@@ -145,11 +141,9 @@ export default class SingleZoomChart extends React.Component {
                 />
                 <YAxis
                   allowDataOverflow
-                  domain={[bottom, top]}
-                  tickFormatter={this.customYAxisTick}
-                  tickCount={20}
-                  
-                  padding={{top: 10, bottom: 20}}
+                  tickCount={5}
+                  domain={[dataMin => (Math.floor(dataMin/10) *10), dataMax => (Math.ceil(dataMax/10) *10)]}
+                  padding={{top: 10, bottom: 5}}
                   type="number"
                   yAxisId="1"
                   width={120}

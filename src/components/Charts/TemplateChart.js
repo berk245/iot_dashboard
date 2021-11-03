@@ -21,10 +21,10 @@ const initialData = [
   { name: 9, cost: 12.79 },
   { name: 10, cost: 12.949 },
   { name: 11, cost: 12.949 },
-  { name: 12, cost: 14.11 },
-  { name: 13, cost: 12.39 },
-  { name: 14, cost: 12.37 },
-  { name: 15, cost: 12.79 },
+  { name: 12, cost: undefined },
+  { name: 13, cost: NaN },
+  { name: 14, cost: null },
+  { name: 15, cost: null },
   { name: 16, cost: 12.94 },
   { name: 17, cost: 14.11 },
   { name: 18, cost: 12.39 },
@@ -159,6 +159,7 @@ export default class TemplateChart extends Component {
             yAxisId="1"
             type="natural"
             dataKey="cost"
+            dot={false}
             stroke="#8884d8"
             animationDuration={300}
           />
