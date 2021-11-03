@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/styles";
-import { TextField } from "@material-ui/core";
+import { CircularProgress, TextField } from "@material-ui/core";
 
 const useStyles = makeStyles(() => ({
   navbarCard: {
@@ -31,6 +31,7 @@ export default function ProjectsNavbar({
   const [allProjects, setAllProjects] = useState([]);
   const [filteredProjects, setFilteredProjects] = useState([])
   const [searchKeyword, setSearchKeyword] = useState([])
+  const [fetchingProjects, setFetchingProjects] = useState(true)
 
   
 
@@ -53,12 +54,14 @@ export default function ProjectsNavbar({
 
   useEffect(() => {
     const getProjects = async () => {
+    setFetchingProjects(true)
     const url = baseURL + "/project/get_all";
     try {
       let res = await fetch(url);
       res = await res.json();
       setAllProjects(JSON.parse(res));
       setFilteredProjects(JSON.parse(res))
+      setFetchingProjects(false)
     } catch (err) {
       console.log("Error while fetching projects");
       console.log(err);
@@ -72,14 +75,22 @@ export default function ProjectsNavbar({
   }, [searchKeyword]);// eslint-disable-line react-hooks/exhaustive-deps
 
   return (
+    
     <>
+    {fetchingProjects?
+      <div style={{textAlign:'center'}}>
+      
+      <CircularProgress style={{marginTop:'3rem'}}/>
+      <p>Creating Project List</p>
+      </div>
+      :
+      <>    
       <TextField
          placeholder='Type to search'
          variant='outlined'
          onChange={(e) => userSearch(e)} 
          style={{padding:'0.5rem 1rem', width:'90%'}}    
       />
-          
       {filteredProjects.map((project) => {
         return (
           <div
@@ -98,6 +109,9 @@ export default function ProjectsNavbar({
           </div>
         );
       })}
+      </>
+    }
+      
     </>
   );
 }
