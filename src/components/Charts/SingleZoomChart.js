@@ -87,7 +87,7 @@ export default class SingleZoomChart extends React.Component {
     return(tick.toFixed(1))
   }
   customXAxisTick(tick){
-    console.log(tick.split(' ').join('\n'))
+    // console.log(tick.split(' ').join('\n'))
     return tick.split(' ').join('\n')
   }
 
