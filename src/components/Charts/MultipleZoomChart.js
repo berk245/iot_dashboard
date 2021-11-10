@@ -18,6 +18,28 @@ import { Button } from "@material-ui/core";
 
 
 
+import { timeConverter } from "./helpers/TimeConverter";
+
+
+
+
+class CustomizedAxisTick extends React.Component{
+
+  render () {
+    const {x, y, stroke, payload} = this.props;
+		let converted = timeConverter(payload.value)
+   	return (
+    	<g transform={`translate(${x},${y})`}>
+        <text x={0} y={0} dy={16} fill="#666">
+          <tspan textAnchor="middle" x="0">{converted.date}</tspan>
+          <tspan textAnchor="middle" x="0" dy="20">{converted.time}</tspan>
+        </text>
+      </g>
+    );
+  }
+};
+
+
 
 export default class SingleZoomChart extends React.Component {
   constructor(props) {
@@ -42,9 +64,9 @@ export default class SingleZoomChart extends React.Component {
         refAreaLeft: "",
         refAreaRight: "",
       });
-
       return;
     }
+
 
     // xAxis domain
     if (refAreaLeft > refAreaRight) {
@@ -57,6 +79,19 @@ export default class SingleZoomChart extends React.Component {
       data: data.slice(),
       left: refAreaLeft,
       right: refAreaRight,
+    }));
+  }
+
+  zoomOut() {
+    const { data } = this.state;
+    this.setState(() => ({
+      data: data.slice(),
+      refAreaLeft: "",
+      refAreaRight: "",
+      left: "dataMin",
+      right: "dataMax",
+      top: "dataMax+1",
+      bottom: "dataMin-1"
     }));
   }
 
@@ -87,20 +122,37 @@ export default class SingleZoomChart extends React.Component {
     return label;
   }
 
-
-
-  customXAxisTick(tick){
-    return tick.split(' ').join('\n')
-  }
-
   legendFormatter = (value, entry, index) => {
     let splitted = this.state.labels[value].split('_')
     return splitted[splitted.length -1]
   }
 
+  renderTooltip = (e) =>{
+    if(!e.payload) return <div></div>
+    try{
+      let color1 = e.payload[0].color
+      let color2 = e.payload[1].color
+      let {data1, data2, timestamp_unix} = e.payload[0].payload 
+      let formatted = timeConverter(timestamp_unix)
+    return (
+   
+    <div style={{border: '1px solid  silver', borderRadius:'5px', background:'white', padding:'0.5rem 1rem'}}>
+        <p>{formatted.date} {formatted.time}</p>
+        <p style={{color: color1}}>{this.props.data.labels.data1} : {data1.toFixed(2)}</p>
+        <p style={{color: color2}}>{this.props.data.labels.data2} : {data2.toFixed(2)}</p>
+    </div>
+    )
+    }catch(err){
+      return <div></div>
+    }
+    
+    
+  }
+
   render() {
     const { data, left, right, refAreaLeft, refAreaRight } =
       this.state;
+
 
     return (
       <>
@@ -129,6 +181,26 @@ export default class SingleZoomChart extends React.Component {
                 </Button>
               </div>
               </div>
+              {left !== "dataMin" && (
+              <div style={{width: '10%', margin:'auto'}}>
+              <Button
+                onClick={this.zoomOut.bind(this)}
+                variant="outlined"
+                size="small"
+                style={{
+                  borderColor: "rgb(171, 0, 60)",
+                  fontSize: "0.75rem",
+                  padding: "0.1rem 0.5rem",
+                  color: "rgb(171, 0, 60)",
+                  fontWeight: 600,
+                  borderWidth: "2px",
+                  textTransform: "none",
+                }}
+              >
+                Zoom Out
+              </Button>
+              </div>
+            )}
             <ResponsiveContainer width="90%" height={400}>
               <LineChart
                 data={data}
@@ -141,13 +213,12 @@ export default class SingleZoomChart extends React.Component {
                 <XAxis
                   height={100}
                   tickMargin={20}
-                  angle={-10}
                   padding={{ left: 50, right: 50 }}
-                  interval={100}
                   allowDataOverflow
                   domain={[left, right]}
-                  dataKey="timestamp"
-                  tickFormatter={this.customXAxisTick}
+                  dataKey="timestamp_unix"
+                  type='number'
+                  tick={<CustomizedAxisTick/>}         
 
                 />
                 <YAxis
@@ -159,14 +230,13 @@ export default class SingleZoomChart extends React.Component {
                   yAxisId="1"
                   width={120}
                 />
-                <Tooltip />
+                <Tooltip content={this.renderTooltip}/>
                 <Line
                   dot={false}
                   strokeWidth={2}
                   yAxisId="1"
                   type="natural"
                   dataKey="data1"
-                  label={false}
                   stroke="#8884d8"
                   animationDuration={300}
                 />
@@ -191,19 +261,10 @@ export default class SingleZoomChart extends React.Component {
                 ) : null}
               </LineChart>
             </ResponsiveContainer>
-
-            {/* {left !== "dataMin" && (
-              <button
-                type="button"
-                className="btn update"
-                onClick={this.zoomOut.bind(this)}
-              >
-                Zoom Out
-              </button>
-            )} */}
           </div>
         )}
       </>
     );
   }
 }
+

@@ -3,7 +3,6 @@ import { CircularProgress, TextField, Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import MultipleZoomChart from "../Charts/MultipleZoomChart";
 import SingleZoomChart from "../Charts/SingleZoomChart";
-import TemplateChart from "../Charts/TemplateChart";
 import SensorsTable from "../Tables/SensorTable";
 import SensorAndDateFilter from "../Charts/SensorAndDateFilter";
 const useStyles = makeStyles((theme) => ({
@@ -80,9 +79,7 @@ function MeasurementsTab({
     url += `&end_datetime=${end}`;
     try {
       let response = await fetch(url);
-      console.log(response, typeof response);
       response = await response.json();
-      console.log(response, typeof response);
       setMeasurements(JSON.parse(response));
     } catch (err) {
       console.log("failed: ", url);
@@ -156,26 +153,6 @@ function MeasurementsTab({
                 <div className={classes.chartsContainer}>
                   {/* <h4>{measurements[0].sensor_name} Measurements</h4> */}
                   {/* <MultipleZoomChart/> */}
-                  {!seeExample ? (
-                    <Button
-                      variant="outlined"
-                      style={{ margin: "1rem" }}
-                      onClick={() => setSeeExample(!seeExample)}
-                    >
-                      See zoom chart example
-                    </Button>
-                  ) : (
-                    <>
-                      <Button
-                        variant="outlined"
-                        style={{ margin: "1rem" }}
-                        onClick={() => setSeeExample(!seeExample)}
-                      >
-                        Close zoom chart example
-                      </Button>
-                      <TemplateChart></TemplateChart>
-                    </>
-                  )}
                   {measurements.length ? (
                     <>
                       {measurements.map((m, idx) => {
