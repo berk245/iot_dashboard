@@ -40,7 +40,7 @@ export const helpers = {
           let cond = JSON.parse(arr[0].condition);
           return cond.or;
         } catch {
-          console.log("Error while extracting stop/start conditions");
+            return false
         }
     }
 }

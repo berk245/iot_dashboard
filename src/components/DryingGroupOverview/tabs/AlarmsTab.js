@@ -27,7 +27,6 @@ function AlarmsTab({
     return()=>{isMounted = false}
   }, []);
 
-  console.log(alarms, alarms == true)
 
 
   return (

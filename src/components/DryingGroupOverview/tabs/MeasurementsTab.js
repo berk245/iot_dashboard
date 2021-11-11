@@ -5,6 +5,7 @@ import MultipleZoomChart from "../../Charts/MultipleZoomChart";
 import SingleZoomChart from "../../Charts/SingleZoomChart";
 import SensorsTable from "../../Tables/SensorTable";
 import SensorAndDateFilter from "../../Charts/SensorAndDateFilter";
+import { requestDataFromAPI } from "../../../utils";
 
 const useStyles = makeStyles((theme) => ({
   chartsContainer: {
@@ -32,6 +33,7 @@ function MeasurementsTab({
   const [fetchError, setFetchError] = useState(false);
   //Initialize the default values
   useEffect(() => {
+    let isMounted = true
     const getToday = () => {
       const date = new Date();
       let formattedDate =
@@ -61,11 +63,16 @@ function MeasurementsTab({
       setSelectedDates(result);
     };
     getToday();
-    setDefaultStartEndDates();
+    if(isMounted) setDefaultStartEndDates();
+
+    return() => {isMounted = false}
   }, []);
 
   const getMeasurements = async (agg, sensor_id, start, end) => {
-    setFetchError(false);
+    
+    let isMounted = true
+    
+    if(isMounted) setFetchError(false);
     if (!start || !end) return true;
 
     let url =
@@ -75,16 +82,15 @@ function MeasurementsTab({
     url += `&sensor_id=${sensor_id}`;
     url += `&start_datetime=${start}`;
     url += `&end_datetime=${end}`;
-    try {
-      let response = await fetch(url);
-      response = await response.json();
-      setMeasurements(JSON.parse(response));
-    } catch (err) {
-      console.log("failed: ", url);
-      console.log(err);
-      setFetchError(true);
+    
+    let data = await requestDataFromAPI(url)
+    if(isMounted){
+      console.log(data)
+      if(data) setMeasurements(data)
+      else setFetchError(true)
     }
-    return false;
+
+
   };
 
   useEffect(() => {
@@ -168,11 +174,11 @@ function MeasurementsTab({
                 </div>
               )}
               {fetchError && (
-                <h5>
+                <p style={{textAlign: 'center'}}>
                   An error occured while fetching data. Please make sure that
                   the search parameters (eg, dates) are in correct format and
                   try again.
-                </h5>
+                </p>
               )}
             </>
           )}

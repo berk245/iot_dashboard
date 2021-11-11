@@ -8,6 +8,7 @@ import Tabs from './tabs/TabContainer'
 const useStyles = makeStyles(() => ({
   mainContainer: {
     marginTop: "1rem",
+    marginBottom: '2rem',
     border: "1px solid #dedede",
     
   },

@@ -177,7 +177,7 @@ export default class SingleZoomChart extends React.Component {
               </div>
               </div>
               {left !== "dataMin" && (
-              <div style={{width: '10%', margin:'auto'}}>
+              <div style={{width: '20%', margin:'auto'}}>
               <Button
                 onClick={this.zoomOut.bind(this)}
                 variant="outlined"
@@ -196,13 +196,14 @@ export default class SingleZoomChart extends React.Component {
               </Button>
               </div>
             )}
-            <ResponsiveContainer width="90%" height={400}>
+            <ResponsiveContainer width="95%" height={400}>
               <LineChart
                 data={data}
                 onMouseDown={(e) => this.handleMouseDown(e)}
                 onMouseMove={(e) => this.handleMouseMove(e)}
                 // eslint-disable-next-line react/jsx-no-bind
                 onMouseUp={this.zoom.bind(this)}
+                margin={{top: 0, right: 0, bottom: 5, left: -60}}
               >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
@@ -256,7 +257,8 @@ export default class SingleZoomChart extends React.Component {
                 ) : null}
               </LineChart>
             </ResponsiveContainer>
-          </div>
+            </div>
+            
         )}
       </>
     );

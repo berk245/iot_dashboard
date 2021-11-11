@@ -31,7 +31,6 @@ function CriteriaTab({
       if (isMounted) {
         if (Array.isArray(criteria)) {
           let arr = helpers.extractAndSetCriteriaArray(criteria);
-          console.log(arr);
           setCriterion(arr);
         } else setFetchError(true);
       }
