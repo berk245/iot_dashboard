@@ -62,25 +62,9 @@ export default function DryingGroupOverview({ baseURL, dryingGroup, dryingTypes,
         console.log(err);
       }
     };
-   
-    const getStartStopCriteria = async() => {
-      let url = baseURL + '/dry_threshold/get/drying_group/'+dryingGroup.id
-      try {
-        let response = await fetch(url);
-        response = await response.json();
-        setStartStopCriteria(JSON.parse(response));
-      } catch (err) {
-        console.log(
-          "Error while fetching threshold data of drying group id:" +
-            dryingGroup.id
-        );
-        console.log(err);
-      }
-    }
 
     const runAsyncInitializer = async() => {
       setLoading(true);
-      await getStartStopCriteria()
       getSensors();
     }
 
@@ -126,7 +110,6 @@ export default function DryingGroupOverview({ baseURL, dryingGroup, dryingTypes,
             measurementTypes={measurementTypes}
             measurementUnits={measurementUnits}
             measurementOperators={measurementOperators}
-            startStopCriteria={startStopCriteria}
           ></TabContainer>
         </div>
       )}

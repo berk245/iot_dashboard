@@ -48,7 +48,6 @@ function TabContainer({
   dryingTypes,
   measurementTypes,
   measurementUnits,
-  startStopCriteria,
   measurementOperators
 }) {
   const [selectedTab, setSelectedTab] = useState("info");
@@ -160,7 +159,6 @@ function TabContainer({
         {selectedTab === "criterion" && (
           <CriteriaTab
             dryingGroup={dryingGroup}
-            startStopCriteria={startStopCriteria}
             sensors={sensors}
             sensorNameAndIdPairs= {sensorNameAndIdPairs}
             typeNameAndIdPairs= {typeNameAndIdPairs}
