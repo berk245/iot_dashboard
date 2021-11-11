@@ -13,11 +13,6 @@ import {
 import { ResponsiveContainer } from "recharts/lib/component/ResponsiveContainer";
 import DownloadChartData from "./helpers/DownloadChartData";
 import { Button } from "@material-ui/core";
-
-
-
-
-
 import { timeConverter } from "./helpers/TimeConverter";
 
 
@@ -165,10 +160,10 @@ export default class SingleZoomChart extends React.Component {
                   variant="outlined"
                   size="small"
                   style={{
-                    borderColor: "#8884d8",
+                    borderColor: "#002884",
                     fontSize:'0.75rem',
                     padding:'0.1rem 0.5rem',
-                    color: "#8884d8",
+                    color: "#002884",
                     fontWeight: 600,
                     borderWidth: '2px',
                     textTransform: 'none'
@@ -237,7 +232,7 @@ export default class SingleZoomChart extends React.Component {
                   yAxisId="1"
                   type="natural"
                   dataKey="data1"
-                  stroke="#8884d8"
+                  stroke="#002884"
                   animationDuration={300}
                 />
                 <Line
@@ -267,4 +262,3 @@ export default class SingleZoomChart extends React.Component {
     );
   }
 }
-

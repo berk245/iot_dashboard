@@ -1,125 +1,97 @@
-import React, { useState, useEffect } from "react";
-import "./App.css";
-import { makeStyles } from "@material-ui/styles";
-// import { Typography, Button, Collapse, Grid } from "@material-ui/core";
-import { Grid } from "@material-ui/core";
 import PageHeader from "./components/PageHeader";
-import ProjectsNavbar from "./components/sidebar/ProjectsNavbar";
-import DryingGroupsNavbar from "./components/sidebar/DryingGroupsNavbar";
-import DryingGroupOverview from "./components/DryingGroupOverview";
+import React, { useState, useEffect } from "react";
+import { makeStyles } from "@material-ui/core";
+import { requestDataFromAPI } from "./utils";
+
+//Components
+import ProjectList from "./components/ProjectList/ProjectList";
+import DryingGroupsList from "./components/DryingGroupsList/DryingGroupsContainer";
+import CircularLoadingIcon from "./components/CircularLoadingIcon";
 
 const useStyles = makeStyles(() => ({
-  navbarContainer: {
-    marginTop: "8vh",
-    height: "90vh",
-    overflow: "auto",
-    borderRight: "1px solid silver",
-    "&::-webkit-scrollbar": {
-      width: "0.5rem",
-    },
-    "&::-webkit-scrollbar-track": {
-      boxShadow: "inset 0 0 6px rgba(0,0,0,0.00)",
-      webkitBoxShadow: "inset 0 0 6px rgba(0,0,0,0.00)",
-    },
-    "&::-webkit-scrollbar-thumb": {
-      backgroundColor: "rgba(63,80,181,0.25)",
-      borderRadius: "5px",
-    },
+  pageContent: {
+    position: "absolute",
+    top: "3.5%",
+    width: "100%",
+    margin: "auto",
   },
 }));
 
-function App() {
-  const baseURL = "https://api.smartdrying.io";
-  const [navbarState, setNavbarState] = useState("selectProject");
-  const [selectedProject, setSelectedProject] = useState([]);
-  const [selectedDryingGroup, setSelectedDryingGroup] = useState(null);
+function App({ urls }) {
+  const [fetchingInitialData, setFetchingInitialData] = useState(true);
+  const [fetchingError, setFetchingError] = useState(false);
+  const [selectedProject, setSelectedProject] = useState("");
+  const [projects, setProjects] = useState([]);
   const [measurementTypes, setMeasurementTypes] = useState([]);
   const [measurementUnits, setMeasurementUnits] = useState([]);
-  const [measurementOperators, setMeasurementOperators] = useState([])
+  const [measurementOperators, setMeasurementOperators] = useState([]);
   const [dryingTypes, setDryingTypes] = useState([]);
 
   const classes = useStyles();
   useEffect(() => {
-    const getMeasurementTypes = async () => {
-      let url = "https://api.smartdrying.io/measurement_type/get_all";
-      let types = await fetch(url);
-      types = await types.json();
-      setMeasurementTypes(JSON.parse(types));
-    };
-    const getMeasurementUnits = async () => {
-      let url = "https://api.smartdrying.io/measurement_unit/get_all";
+    
+    let isMounted = true;
+    requestDataFromAPI("https://api.smartdrying.io/project/get_all")
+      .then((projects) => {
+        if (isMounted){
+          setProjects(projects);
+          setFetchingInitialData(false)
+        } 
 
-      let units = await fetch(url);
-      units = await units.json();
-      setMeasurementUnits(JSON.parse(units));
-    };
-    const getDryingTypes = async () => {
-      try {
-        let url = "https://api.smartdrying.io/drying_type/get_all";
-        let res = await fetch(url);
-        res = await res.json();
-        setDryingTypes(JSON.parse(res));
-      } catch (err) {
-        console.log("Error while fetching measurement types ");
+      })
+      .catch((err) => {
         console.log(err);
-        return;
-      }
-    };
-    const getOperators = async () => {
-      try {
-        let url = "https://api.smartdrying.io/operator/get_all";
-        let res = await fetch(url);
-        res = await res.json();
-        setMeasurementOperators(JSON.parse(res));
-      } catch (err) {
-        console.log("Error while fetching operators ");
-        console.log(err);
-        return;
-      }
-    }
+        if (isMounted) {
+          setFetchingInitialData(false)
+          setFetchingError(true)
+        };
+      });
+    
 
-    getMeasurementTypes();
-    getMeasurementUnits();
-    getDryingTypes();
-    getOperators()
+    return () => {
+      isMounted = false;
+    }; //clenup
   }, []);
+
 
   return (
     <div className="App">
-      <PageHeader />
-      <Grid container>
-        <Grid item sm={6} md={4} lg={3} className={classes.navbarContainer}>
-          {navbarState === "selectProject" && (
-            <ProjectsNavbar
-              baseURL={baseURL}
-              setNavbarState={setNavbarState}
-              setSelectedProject={setSelectedProject}
-            />
-          )}
-          {navbarState === "selectDryingGroup" && (
-            <DryingGroupsNavbar
-              baseURL={baseURL}
-              projectID={selectedProject.id}
-              projectName={selectedProject.name}
-              setNavbarState={setNavbarState}
-              setSelectedDryingGroup={setSelectedDryingGroup}
-              setSelectedProject={setSelectedProject}
-            />
-          )}
-        </Grid>
-        {selectedDryingGroup && (
-          <Grid item sm={6} md={8} lg={9} className={classes.dryingGroupData}>
-            <DryingGroupOverview
-              baseURL={baseURL}
-              dryingGroup={selectedDryingGroup}
-              measurementTypes={measurementTypes}
-              measurementUnits={measurementUnits}
-              dryingTypes={dryingTypes}
-              measurementOperators={measurementOperators}
-            ></DryingGroupOverview>
-          </Grid>
+      <PageHeader className={classes.header}></PageHeader>
+      <div className={classes.pageContent}>
+        {!fetchingError ? (
+          <div style={{ marginTop: "1rem" }}>
+            {fetchingInitialData ? (
+              <CircularLoadingIcon text={"Creating Project List"} />
+            ) : (
+              <>
+                {!selectedProject ? (
+                  <ProjectList
+                    className={classes.sidebar}
+                    projects={projects}
+                    setSelectedProject={setSelectedProject}
+                  />
+                ) : (
+                  <DryingGroupsList
+                    selectedProject={selectedProject}
+                    setSelectedProject={setSelectedProject}
+                  />
+                )}
+              </>
+            )}
+          </div>
+        ) : (
+          <p
+            data-testid="error-text"
+            style={{
+              textAlign: "center",
+              marginTop: "3rem",
+              fontSize: "1.1rem",
+            }}
+          >
+            An error occured while fetching data. Please refresh the page.
+          </p>
         )}
-      </Grid>
+      </div>
     </div>
   );
 }

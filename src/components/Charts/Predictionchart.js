@@ -5,7 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 
 const useStyles = makeStyles(()=>({
     chartTitle:{
-        margin: '2rem 0rem 0rem 2.5rem'
+        margin: '2rem 0rem 0rem 5%'
     }
 }))
 
@@ -47,15 +47,15 @@ function PredictionChart() {
     return (
         <>
         <h4 className={classes.chartTitle}>Possibility of Completion (%) [Hardcoded Dummy Data]</h4>
-        <ResponsiveContainer width='90%' height={200} margin='auto'>
+        <ResponsiveContainer width='100%' height={200}>
         <BarChart
           data={data}
           barCategoryGap={5}
           margin={{
             top: 50,
-            right: 50,
-            left: 20,
-            bottom: 5,
+            right: 0,
+            left: 0,
+            bottom: 20,
           }}
           top={100}
         >
@@ -64,7 +64,7 @@ function PredictionChart() {
           <YAxis />
           <Tooltip />
           <Legend />
-          <Bar dataKey="likelihood" fill="#AB003C" />
+          <Bar dataKey="likelihood" fill="#002884" />
         </BarChart>
         </ResponsiveContainer>
       </>

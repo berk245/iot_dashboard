@@ -3,14 +3,26 @@ import React from "react";
 
 const useStyles = makeStyles(() => ({
   sensorTable: {
-    width: "95%",
-    margin: "2rem auto",
+    width: "90%",
+    margin: "0rem auto",
     outline: "1px solid silver",
     borderRadius: "5px",
     padding: "1rem",
     fontSize: "0.9rem",
     lineHeight: "2rem",
+    "@media (max-width: 1150px)": {
+      width: "100%",
+    },
   },
+  tableHeader:{ 
+    borderBottom: "2px solid silver", 
+    textAlign:'left',
+    width: 'auto',
+    "@media (max-width: 1150px)": {
+      fontSize: "0.9rem",
+    },
+  }
+
 }));
 
 function SensorsTable({
@@ -25,11 +37,11 @@ function SensorsTable({
       {alarms.length ?
       <table className={classes.sensorTable}>
         <tr>
-          <th style={{ borderBottom: "2px solid silver" }}>Sensor</th>
-          <th style={{ borderBottom: "2px solid silver" }}>Measurement Type</th>
-          <th style={{ borderBottom: "2px solid silver" }}>Min Threshold</th>
-          <th style={{ borderBottom: "2px solid silver" }}>Max Threshold</th>
-          <th style={{ borderBottom: "2px solid silver" }}>Measurement Unit</th>
+          <th className={classes.tableHeader}>Sensor</th>
+          <th className={classes.tableHeader}>Measurement Type</th>
+          <th className={classes.tableHeader}>Min Threshold</th>
+          <th className={classes.tableHeader}>Max Threshold</th>
+          <th className={classes.tableHeader}>Measurement Unit</th>
         </tr>
         {alarms.map((alarm, index) => {
           return (

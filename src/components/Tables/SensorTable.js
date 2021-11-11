@@ -4,7 +4,7 @@ import React from "react";
 const useStyles = makeStyles(() => ({
   sensorTable: {
     width: "95%",
-    margin: "2rem auto",
+    margin: "auto",
     outline: "1px solid silver",
     borderRadius: "5px",
     padding: "1rem",

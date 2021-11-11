@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { CircularProgress, TextField, Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
-import MultipleZoomChart from "../Charts/MultipleZoomChart";
-import SingleZoomChart from "../Charts/SingleZoomChart";
-import SensorsTable from "../Tables/SensorTable";
-import SensorAndDateFilter from "../Charts/SensorAndDateFilter";
+import CircularLoadingIcon from '../../CircularLoadingIcon'
+import MultipleZoomChart from "../../Charts/MultipleZoomChart";
+import SingleZoomChart from "../../Charts/SingleZoomChart";
+import SensorsTable from "../../Tables/SensorTable";
+import SensorAndDateFilter from "../../Charts/SensorAndDateFilter";
+
 const useStyles = makeStyles((theme) => ({
   chartsContainer: {
     marginTop: "1rem",
@@ -26,9 +27,6 @@ function MeasurementsTab({
   const [loading, setLoading] = useState(true);
   const [measurements, setMeasurements] = useState([]);
   const [selectedSensor, setSelectedSensor] = useState(sensors[0]);
-  const [groupedMeasurements, setGroupedMeasurements] = useState({});
-  const [measurementsGrouped, setMeasurementsGrouped] = useState(false);
-  const [seeExample, setSeeExample] = useState(false);
   const [dryingGroupHasNoSensors, setDryingGroupHasNoSensors] = useState(false);
 
   const [fetchError, setFetchError] = useState(false);
@@ -103,6 +101,7 @@ function MeasurementsTab({
           selectedDates.start_datetime,
           selectedDates.end_datetime
         ); //Returns a boolean
+
         setLoading(false);
       } catch (err) {
         console.log("Dates not set");
@@ -121,6 +120,7 @@ function MeasurementsTab({
     }
   };
 
+
   const classes = useStyles();
   return (
     <>
@@ -130,11 +130,10 @@ function MeasurementsTab({
       
       //Main Page Content
       (
-        <div>
+        <div style={{paddingTop:'2rem'}}>
           {loading && (
             <div style={{ margin: "auto", marginTop: "5rem" }}>
-              <p>Fetching data...</p>
-              <CircularProgress disableShrink></CircularProgress>
+              <CircularLoadingIcon text={'Fetching sensors and measurements'}/>
             </div>
           )}
 
@@ -150,9 +149,7 @@ function MeasurementsTab({
                 requestNewCharts={requestNewCharts}
               />
               {!fetchError && (
-                <div className={classes.chartsContainer}>
-                  {/* <h4>{measurements[0].sensor_name} Measurements</h4> */}
-                  {/* <MultipleZoomChart/> */}
+                <div className={classes.chartsContainer}>         
                   {measurements.length ? (
                     <>
                       {measurements.map((m, idx) => {
@@ -165,7 +162,7 @@ function MeasurementsTab({
                     </>
                   ) : (
                     <div style={{ textAlign: "center", paddingBottom: "5rem" }}>
-                      <CircularProgress />
+                      <CircularLoadingIcon text={'Drawing charts'}/>
                     </div>
                   )}{" "}
                 </div>
