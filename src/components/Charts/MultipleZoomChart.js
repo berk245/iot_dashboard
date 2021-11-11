@@ -221,7 +221,7 @@ export default class SingleZoomChart extends React.Component {
                   allowDataOverflow
                   tickCount={5}
                   domain={[dataMin => (Math.floor(dataMin/10) *10), dataMax => (Math.ceil(dataMax/10) *10)]}
-                  padding={{top: 10, bottom: 5}}
+                  padding={{top: 10, bottom: 10}}
                   type="number"
                   yAxisId="1"
                   width={120}

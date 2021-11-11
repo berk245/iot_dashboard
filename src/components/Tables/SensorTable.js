@@ -11,6 +11,14 @@ const useStyles = makeStyles(() => ({
     fontSize: "0.9rem",
     lineHeight: "2rem",
   },
+  tableHeader:{ 
+    borderBottom: "2px solid silver", 
+    textAlign:'left',
+    width: 'auto',
+    "@media (max-width: 1150px)": {
+      fontSize: "0.9rem",
+    },
+  }
 }));
 
 function SensorsTable({ sensors }) {
@@ -20,11 +28,11 @@ function SensorsTable({ sensors }) {
       <table className={classes.sensorTable}>
         <thead>
           <tr>
-            <th style={{ borderBottom: "2px solid silver" }}>Sensor name</th>
-            <th style={{ borderBottom: "2px solid silver" }}> Sensor ID</th>
-            <th style={{ borderBottom: "2px solid silver" }}> DeveUI</th>
-            <th style={{ borderBottom: "2px solid silver" }}>Sensor Type</th>
-            <th style={{ borderBottom: "2px solid silver" }}>Description</th>
+            <th className={classes.tableHeader}>Sensor name</th>
+            <th className={classes.tableHeader}> Sensor ID</th>
+            <th className={classes.tableHeader}> DeveUI</th>
+            <th className={classes.tableHeader}>Sensor Type</th>
+            <th className={classes.tableHeader}>Description</th>
           </tr>
         </thead>
         <tbody>
