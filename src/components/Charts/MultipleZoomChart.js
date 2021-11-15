@@ -8,6 +8,7 @@ import {
   CartesianGrid,
   Tooltip,
   ReferenceArea,
+  ReferenceLine,
   Legend
 } from "recharts";
 import { ResponsiveContainer } from "recharts/lib/component/ResponsiveContainer";
@@ -47,6 +48,7 @@ export default class SingleZoomChart extends React.Component {
       refAreaRight: "",
       animation: true,
       labels: props.data.labels,
+      events: props.chartEvents
     };
       
   }
@@ -145,8 +147,9 @@ export default class SingleZoomChart extends React.Component {
   }
 
   render() {
-    const { data, left, right, refAreaLeft, refAreaRight } =
-      this.state;
+    const { data, left, right, refAreaLeft, refAreaRight, events } =
+    this.state;
+
 
 
     return (
@@ -206,6 +209,11 @@ export default class SingleZoomChart extends React.Component {
                 margin={{top: 0, right: 0, bottom: 5, left: -60}}
               >
                 <CartesianGrid strokeDasharray="3 3" />
+                {events.map((e, idx ) => {
+                  return(
+                  <ReferenceLine key={idx} x={e.timestamp/1000} xAxisId="0" yAxisId="1" label={{ position: 'bottom',  value: `Event ${idx}`, fill: 'red', fontSize: 14 }} strokeWidth={3} stroke='red'/>
+                  )
+                })}
                 <XAxis
                   height={100}
                   tickMargin={20}

@@ -29,6 +29,7 @@ function MeasurementsTab({
   const [measurements, setMeasurements] = useState([]);
   const [selectedSensor, setSelectedSensor] = useState(sensors[0]);
   const [dryingGroupHasNoSensors, setDryingGroupHasNoSensors] = useState(false);
+  const [chartEvents, setChartEvents] = useState([])
 
   const [fetchError, setFetchError] = useState(false);
   //Initialize the default values
@@ -85,13 +86,26 @@ function MeasurementsTab({
     
     let data = await requestDataFromAPI(url)
     if(isMounted){
-      console.log(data)
       if(data) setMeasurements(data)
       else setFetchError(true)
     }
 
 
   };
+
+  const getChartEvents = async (dryingGroupId) =>{
+
+    let events;
+    try{
+      events = await requestDataFromAPI(`https://api.smartdrying.io/event/get/drying_group/${dryingGroupId}`)
+      setChartEvents(events)
+    }catch{
+      console.log('Error fetching events')
+      setFetchError(true)
+    }
+
+  }
+
 
   useEffect(() => {
     const measurementsInitializer = async () => {
@@ -115,6 +129,20 @@ function MeasurementsTab({
     };
     measurementsInitializer();
   }, [today]);
+
+
+  //Get Chart Events
+  useEffect(() => {
+    let isMounted = true
+    
+    if(isMounted) getChartEvents(dryingGroup.id)
+
+    return () => {
+      isMounted = false
+    };
+  }, [measurements]);
+
+
 
   const requestNewCharts = async (agg, id, start, end) => {
     setLoading(true);
@@ -160,9 +188,9 @@ function MeasurementsTab({
                     <>
                       {measurements.map((m, idx) => {
                         if (m.labels.data2) {
-                          return <MultipleZoomChart key={idx} data={m} />;
+                          return <MultipleZoomChart key={idx} data={m} chartEvents={chartEvents} chartEvents={chartEvents}/>;
                         } else {
-                          return <SingleZoomChart key={idx} data={m} />;
+                          return <SingleZoomChart key={idx} data={m} chartEvents={chartEvents} />;
                         }
                       })}
                     </>
