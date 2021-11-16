@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 import { makeStyles } from "@material-ui/styles";
 import CircularLoadingIcon from '../../CircularLoadingIcon'
 import MultipleZoomChart from "../../Charts/MultipleZoomChart";
@@ -30,6 +30,8 @@ function MeasurementsTab({
   const [selectedSensor, setSelectedSensor] = useState(sensors[0]);
   const [dryingGroupHasNoSensors, setDryingGroupHasNoSensors] = useState(false);
   const [chartEvents, setChartEvents] = useState([])
+  const [eventTypes, setEventTypes] = useState([])
+  const [,updateComponent]=useReducer(x => x + 1, 0)
 
   const [fetchError, setFetchError] = useState(false);
   //Initialize the default values
@@ -71,9 +73,7 @@ function MeasurementsTab({
 
   const getMeasurements = async (agg, sensor_id, start, end) => {
     
-    let isMounted = true
     
-    if(isMounted) setFetchError(false);
     if (!start || !end) return true;
 
     let url =
@@ -85,29 +85,39 @@ function MeasurementsTab({
     url += `&end_datetime=${end}`;
     
     let data = await requestDataFromAPI(url)
-    if(isMounted){
+    
       if(data) setMeasurements(data)
       else setFetchError(true)
-    }
-
 
   };
 
   const getChartEvents = async (dryingGroupId) =>{
-
     let events;
+    setLoading(true)
     try{
       events = await requestDataFromAPI(`https://api.smartdrying.io/event/get/drying_group/${dryingGroupId}`)
+      console.log('new evs')
       setChartEvents(events)
     }catch{
       console.log('Error fetching events')
       setFetchError(true)
     }
-
+    setLoading(false)
+  }
+  const getEventTypes = async()=>{
+    let types;
+    try{
+      types = await requestDataFromAPI(`https://api.smartdrying.io/event_type/get_all`)
+      setEventTypes(types)
+    }catch{
+      console.log('Error fetching event types')
+      setFetchError(true)
+    }
   }
 
 
   useEffect(() => {
+    let isMounted = true
     const measurementsInitializer = async () => {
       if (!selectedSensor) {
         console.log("No Sensor");
@@ -127,9 +137,16 @@ function MeasurementsTab({
         console.log("Dates not set");
       }
     };
-    measurementsInitializer();
-  }, [today]);
 
+    if(isMounted){
+      setFetchError(false);
+      measurementsInitializer();
+      getEventTypes();
+    }  
+    return()=>{
+      isMounted = false
+    }   
+  }, [today]);
 
   //Get Chart Events
   useEffect(() => {
@@ -140,9 +157,7 @@ function MeasurementsTab({
     return () => {
       isMounted = false
     };
-  }, [measurements]);
-
-
+  }, []);
 
   const requestNewCharts = async (agg, id, start, end) => {
     setLoading(true);
@@ -153,7 +168,6 @@ function MeasurementsTab({
       setFetchError(true);
     }
   };
-
 
   const classes = useStyles();
   return (
@@ -188,7 +202,7 @@ function MeasurementsTab({
                     <>
                       {measurements.map((m, idx) => {
                         if (m.labels.data2) {
-                          return <MultipleZoomChart key={idx} data={m} chartEvents={chartEvents} chartEvents={chartEvents}/>;
+                          return <MultipleZoomChart key={idx} data={m} chartEvents={chartEvents} getChartEvents={getChartEvents} dryingGroup={dryingGroup} eventTypes={eventTypes}/>;
                         } else {
                           return <SingleZoomChart key={idx} data={m} chartEvents={chartEvents} />;
                         }
