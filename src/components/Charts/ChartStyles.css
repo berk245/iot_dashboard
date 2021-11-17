@@ -1,0 +1,48 @@
+.addEventContainer{
+    border: 1px solid silver;
+    padding: 0.5rem;
+    border-radius: 5px;
+    margin-top: 1rem;
+}
+.timestamp-section, .event-type-selector{
+    display: inline-block;
+    padding: 0.5rem;
+    width: 35%;
+}
+.add-event-buttons{
+    display: inline-block;
+    padding: 0.5rem;
+    width: 25%
+}
+.timestamp-input, .select-dropdown{
+    margin-left: 0.75rem;
+    font-size: 0.9rem;
+    width:70%;
+    padding: 0.5rem;
+}
+.add-event-button{
+    margin: 0 0.5rem
+}
+
+@media screen and (max-width: 1050px) {
+    .addEventContainer{
+        width: 95%;
+    }
+    .timestamp-section, .event-type-selector{
+        display: inline-block;
+        padding: 0.5rem;
+        width: 30%;
+        font-size: 0.85rem;
+    }
+    .add-event-buttons{
+        width: 30%
+    }
+    .timestamp-input, .select-dropdown{
+        font-size: 0.85rem;
+        width:90%;
+        margin-left: 0rem;
+        margin-top: 0.25rem;
+    }
+    
+    
+}

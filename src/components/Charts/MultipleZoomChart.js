@@ -16,6 +16,7 @@ import DownloadChartData from "./helpers/DownloadChartData";
 import { Button } from "@material-ui/core";
 import { timeConverter } from "./helpers/TimeConverter";
 import { TextField } from "@material-ui/core";
+import ChartStyles from './ChartStyles.css'
 
 class CustomizedAxisTick extends React.Component {
   render() {
@@ -104,26 +105,23 @@ export default class MultipleZoomChart extends React.Component {
 
     return (
       <div
+        className='addEventContainer'
         style={{
-          border: "1px solid silver",
-          padding: "0.5rem",
-          borderRadius: "5px",
-          marginTop: '1rem',
-          width: '95%'
+          
         }}
       >
-        <div style={{display:'inline-block', padding:'0.5rem', width: '30%'}}>
+        <div className='timestamp-section'>
           <label htmlFor="#event-timestamp">Timestamp:</label>
           <input
             id="event-timestamp"
             value={timestampDisplay}
             placeholder="Click on a point in chart to "
-            style={{marginLeft: '0.5rem', fontSize: '0.9rem', width:'40%', padding: '0.5rem', width:'60%'}}
+            className='timestamp-input'
           />
         </div>
-        <div style={{display:'inline-block', padding:'0.5rem', width: '30%'}}>
+        <div className='event-type-selector'>
           <span>Event Type</span>
-          <select id="event-type-selector" onChange={setEventType} style={{marginLeft: '0.5rem', width:'65%', fontSize: '0.9rem', padding: '0.5rem'}}>
+          <select id="event-type-selector" onChange={setEventType} className='select-dropdown' >
             <option disabled selected>
               Choose an event type
             </option>
@@ -136,12 +134,13 @@ export default class MultipleZoomChart extends React.Component {
             })}
           </select>
         </div>
-        <div style={{display:'inline-block', padding:'0.5rem', width: 'auto'}}>
+        <div className='add-event-buttons'>
           <Button
             variant="outlined"
             onClick={() => {
               this.makePostRequest(date, time, this.state.newEventType);
             }}
+            className='add-event-button'
             style={{marginRight: '1rem'}}
           >
             Add Event
@@ -151,6 +150,7 @@ export default class MultipleZoomChart extends React.Component {
             onClick={() => {
               this.setState({ addEventForm: false });
             }}
+            className='add-event-button'
           >
             Cancel
           </Button>
@@ -331,7 +331,9 @@ export default class MultipleZoomChart extends React.Component {
                   Download as CSV
                 </Button>
                 {addEventForm ? (
-                  <>{this.AddEventForm(eventTypes, newEventTimeStamp)}</>
+                  <div style={{width: '95%'}}>
+                  {this.AddEventForm(eventTypes, newEventTimeStamp)}
+                  </div>
                 ) : (
                   <Button
                     variant="outlined"
