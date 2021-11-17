@@ -16,7 +16,7 @@ import DownloadChartData from "./helpers/DownloadChartData";
 import { Button } from "@material-ui/core";
 import { timeConverter } from "./helpers/TimeConverter";
 import { TextField } from "@material-ui/core";
-import ChartStyles from './ChartStyles.css'
+import ChartStyles from "./ChartStyles.css";
 
 class CustomizedAxisTick extends React.Component {
   render() {
@@ -33,6 +33,27 @@ class CustomizedAxisTick extends React.Component {
           </tspan>
         </text>
       </g>
+    );
+  }
+}
+
+class CustomEventLabel extends React.Component {
+  render() {
+    const { viewBox, event, eventTypes } = this.props;
+    console.log(event, eventTypes)
+    const x = viewBox.width + viewBox.x + 20;
+    const y = viewBox.y + 2;
+    return (
+      <text
+        x={x}
+        y={y}
+        dy={10}
+        dx={-10}
+        fill='#666'
+        style={{fontSize: '0.85rem'}}
+      >
+        {eventTypes[event.event_type_id -1].description}
+      </text>
     );
   }
 }
@@ -91,12 +112,11 @@ export default class MultipleZoomChart extends React.Component {
     let date = "";
     let time = "";
     let eventType = "";
-    let timestampDisplay = 'Click on the chart to select a date'
+    let timestampDisplay = "Click on the chart to select a date";
     if (timestamp) {
       date = timeConverter(timestamp).date;
       time = timeConverter(timestamp).time;
-      timestampDisplay = date + " " + time
-      
+      timestampDisplay = date + " " + time;
     }
 
     const setEventType = (e) => {
@@ -104,24 +124,23 @@ export default class MultipleZoomChart extends React.Component {
     };
 
     return (
-      <div
-        className='addEventContainer'
-        style={{
-          
-        }}
-      >
-        <div className='timestamp-section'>
+      <div className="addEventContainer" style={{}}>
+        <div className="timestamp-section">
           <label htmlFor="#event-timestamp">Timestamp:</label>
           <input
             id="event-timestamp"
             value={timestampDisplay}
             placeholder="Click on a point in chart to "
-            className='timestamp-input'
+            className="timestamp-input"
           />
         </div>
-        <div className='event-type-selector'>
+        <div className="event-type-selector">
           <span>Event Type</span>
-          <select id="event-type-selector" onChange={setEventType} className='select-dropdown' >
+          <select
+            id="event-type-selector"
+            onChange={setEventType}
+            className="select-dropdown"
+          >
             <option disabled selected>
               Choose an event type
             </option>
@@ -134,14 +153,14 @@ export default class MultipleZoomChart extends React.Component {
             })}
           </select>
         </div>
-        <div className='add-event-buttons'>
+        <div className="add-event-buttons">
           <Button
             variant="outlined"
             onClick={() => {
               this.makePostRequest(date, time, this.state.newEventType);
             }}
-            className='add-event-button'
-            style={{marginRight: '1rem'}}
+            className="add-event-button"
+            style={{ marginRight: "1rem" }}
           >
             Add Event
           </Button>
@@ -150,7 +169,7 @@ export default class MultipleZoomChart extends React.Component {
             onClick={() => {
               this.setState({ addEventForm: false });
             }}
-            className='add-event-button'
+            className="add-event-button"
           >
             Cancel
           </Button>
@@ -315,15 +334,7 @@ export default class MultipleZoomChart extends React.Component {
                 <Button
                   variant="outlined"
                   size="small"
-                  style={{
-                    borderColor: "#002884",
-                    fontSize: "0.8rem",
-                    padding: "0.25rem 0.5rem",
-                    color: "#002884",
-                    fontWeight: 600,
-                    borderWidth: "2px",
-                    textTransform: "none",
-                  }}
+                  className="download-csv-button"
                   onClick={() => {
                     DownloadChartData(data);
                   }}
@@ -331,23 +342,14 @@ export default class MultipleZoomChart extends React.Component {
                   Download as CSV
                 </Button>
                 {addEventForm ? (
-                  <div style={{width: '95%'}}>
-                  {this.AddEventForm(eventTypes, newEventTimeStamp)}
+                  <div style={{ width: "95%" }}>
+                    {this.AddEventForm(eventTypes, newEventTimeStamp)}
                   </div>
                 ) : (
                   <Button
                     variant="outlined"
                     size="small"
-                    style={{
-                      borderColor: "#002884",
-                      fontSize: "0.8rem",
-                      padding: "0.25rem 0.5rem",
-                      margin: "0 1rem",
-                      color: "#002884",
-                      fontWeight: 600,
-                      borderWidth: "2px",
-                      textTransform: "none",
-                    }}
+                    className="event-form-opener"
                     onClick={() => this.setState({ addEventForm: true })}
                   >
                     Add an Event
@@ -437,12 +439,7 @@ export default class MultipleZoomChart extends React.Component {
                       x={e.timestamp / 1000}
                       xAxisId="0"
                       yAxisId="1"
-                      label={{
-                        position: "bottom",
-                        value: `${eventTypes[e.event_type_id - 1].description}`,
-                        fill: "black",
-                        fontSize: 14,
-                      }}
+                      label={<CustomEventLabel event={e} eventTypes={eventTypes} />}
                       strokeWidth={3}
                       stroke="gray"
                       strokeDasharray="5 5"
