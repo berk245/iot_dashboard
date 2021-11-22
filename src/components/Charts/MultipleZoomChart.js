@@ -38,22 +38,49 @@ class CustomizedAxisTick extends React.Component {
 }
 
 class CustomEventLabel extends React.Component {
+
+  deleteEvent = async(id) => {
+    let confirm = window.confirm('Are you sure you want to delete this event?')
+    if(!confirm) return
+
+    let response = await fetch(`https://api.smartdrying.io/event/remove/${id}`)
+    if(response.ok){
+      this.props.getChartEvents(id);
+    }
+
+  }
+  buttonStyle = {
+    background: 'crimson',
+    marginLeft:'0.25rem',
+    color: 'white',
+    fontWeight:600,
+    border: 'none',
+    borderRadius:'5px',
+    fontSize:'0.6rem',
+    cursor: 'pointer',
+    padding:'0.3rem'
+    }
+
   render() {
+
     const { viewBox, event, eventTypes } = this.props;
-    console.log(event, eventTypes)
-    const x = viewBox.width + viewBox.x + 20;
-    const y = viewBox.y + 2;
+    const x = viewBox.width + viewBox.x + 5;
+    const y = viewBox.y;
     return (
-      <text
-        x={x}
-        y={y}
-        dy={10}
-        dx={-10}
-        fill='#666'
-        style={{fontSize: '0.85rem'}}
+      <foreignObject x={x} y={y} 
+      width="130" height='24'
+      style={{
+        fontSize:'0.75rem',
+        zIndex:5
+      }}
+      // dy={10} dx={-10}
       >
-        {eventTypes[event.event_type_id -1].description}
-      </text>
+        <span>{eventTypes[event.event_type_id - 1].description}</span>
+       <button 
+        style={this.buttonStyle}
+         onClick={()=>this.deleteEvent(this.props.event.id)}
+         >X</button>
+      </foreignObject>
     );
   }
 }
@@ -405,7 +432,7 @@ export default class MultipleZoomChart extends React.Component {
                     (dataMin) => Math.floor(dataMin / 10) * 10,
                     (dataMax) => Math.ceil(dataMax / 10) * 10,
                   ]}
-                  padding={{ top: 10, bottom: 10 }}
+                  padding={{ top: 30, bottom: 30 }}
                   type="number"
                   yAxisId="1"
                   width={120}
@@ -439,7 +466,9 @@ export default class MultipleZoomChart extends React.Component {
                       x={e.timestamp / 1000}
                       xAxisId="0"
                       yAxisId="1"
-                      label={<CustomEventLabel event={e} eventTypes={eventTypes} />}
+                      label={
+                        <CustomEventLabel event={e} eventTypes={eventTypes} getChartEvents={this.props.getChartEvents}/>
+                      }
                       strokeWidth={3}
                       stroke="gray"
                       strokeDasharray="5 5"
