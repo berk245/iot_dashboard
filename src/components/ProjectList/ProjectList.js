@@ -8,23 +8,21 @@ const useStyles = makeStyles(() => ({
     width: "90%",
     overflow: "auto",
     margin: "auto",
+    marginBottom: '2rem'
   },
   cardsContainer: {
-    maxHeight: "80vh",
-    width: "99%",
+    width: "100%",
     overflow: "auto",
-    border: "2px solid silver",
     borderRadius: "5px",
   },
   navbarCard: {
-    width: "100%",
+    width: "99%",
     background: 'white',
-    border:'none',
     fontSize: '0.9rem',
-    fontFamily:'',
-    borderBottom: "1px solid silver",
+    border: "1px solid #ababab",
+    margin: "0.5rem 1rem 0.5rem 0",
     borderRadius: "5px",
-    padding: "1rem 0",
+    padding: "1rem",
     "&:hover": {
       backgroundColor: "#f2f2f2",
       cursor: "pointer",
@@ -82,12 +80,10 @@ export default function ProjectsSidebar({ projects, setSelectedProject }) {
                   onClick={() => handleProjectChoice(project)}
                 >
                   <div className={classes.singleLine}>
-                    <p style={{ fontWeight: 600 }}>Project Name:</p>
-                    <p style={{ marginLeft: "0.75rem" }}>{project.name}</p>
+                    <p style={{ fontWeight: 600, fontSize: '0.95rem', color: '#002884' }}>{project.name}</p>
                   </div>
                   <div className={classes.singleLine}>
-                    <p style={{ fontWeight: 600 }}>Project ID:</p>
-                    <p style={{ marginLeft: "0.75rem" }}>{project.id}</p>
+                    <p style={{ fontSize: '0.95rem', marginBottom:'1rem' }}>Project ID: {project.id}</p>
                   </div>
                 </button>
               );
