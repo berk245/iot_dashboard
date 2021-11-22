@@ -45,7 +45,7 @@ class CustomEventLabel extends React.Component {
 
     let response = await fetch(`https://api.smartdrying.io/event/remove/${id}`)
     if(response.ok){
-      this.props.getChartEvents(id);
+      this.props.getChartEvents(this.props.dryingGroupId);
     }
 
   }
@@ -116,7 +116,6 @@ export default class MultipleZoomChart extends React.Component {
       event_type_id: type,
       timestamp: formattedDate,
     };
-    console.log(data);
 
     let response = await fetch("https://api.smartdrying.io/event/add", {
       method: "POST",
@@ -128,14 +127,12 @@ export default class MultipleZoomChart extends React.Component {
     } else {
       response = await response.json();
       let error = JSON.parse(response.body);
-      console.log(error.partialFailureErrors.reason);
       alert(error.partialFailureErrors.trigger);
       return;
     }
   };
 
   AddEventForm = (types, timestamp) => {
-    console.log(timestamp);
     let date = "";
     let time = "";
     let eventType = "";
@@ -335,7 +332,6 @@ export default class MultipleZoomChart extends React.Component {
       newEventTimeStamp,
     } = this.state;
 
-    console.log(eventTypes);
     return (
       <>
         {data && (
@@ -467,7 +463,7 @@ export default class MultipleZoomChart extends React.Component {
                       xAxisId="0"
                       yAxisId="1"
                       label={
-                        <CustomEventLabel event={e} eventTypes={eventTypes} getChartEvents={this.props.getChartEvents}/>
+                        <CustomEventLabel event={e} eventTypes={eventTypes} getChartEvents={this.props.getChartEvents} dryingGroupId={this.props.dryingGroup.id}/>
                       }
                       strokeWidth={3}
                       stroke="gray"

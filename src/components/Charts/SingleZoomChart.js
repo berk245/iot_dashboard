@@ -9,35 +9,83 @@ import {
   Tooltip,
   ReferenceArea,
   ReferenceLine,
-  Legend
+  Legend,
 } from "recharts";
 import { ResponsiveContainer } from "recharts/lib/component/ResponsiveContainer";
 import DownloadChartData from "./helpers/DownloadChartData";
 import { Button } from "@material-ui/core";
 import { timeConverter } from "./helpers/TimeConverter";
+import { TextField } from "@material-ui/core";
+import ChartStyles from "./ChartStyles.css";
 
-
-
-
-class CustomizedAxisTick extends React.Component{
-
-  render () {
-    const {x, y, stroke, payload} = this.props;
-		let converted = timeConverter(payload.value)
-   	return (
-    	<g transform={`translate(${x},${y})`}>
+class CustomizedAxisTick extends React.Component {
+  render() {
+    const { x, y, stroke, payload } = this.props;
+    let converted = timeConverter(payload.value);
+    return (
+      <g transform={`translate(${x},${y})`}>
         <text x={0} y={0} dy={16} fill="#666">
-          <tspan textAnchor="middle" x="0">{converted.date}</tspan>
-          <tspan textAnchor="middle" x="0" dy="20">{converted.time}</tspan>
+          <tspan textAnchor="middle" x="0">
+            {converted.date}
+          </tspan>
+          <tspan textAnchor="middle" x="0" dy="20">
+            {converted.time}
+          </tspan>
         </text>
       </g>
     );
   }
-};
+}
 
+class CustomEventLabel extends React.Component {
 
+  deleteEvent = async(id) => {
+    let confirm = window.confirm('Are you sure you want to delete this event?')
+    if(!confirm) return
 
-export default class SingleZoomChart extends React.Component {
+    let response = await fetch(`https://api.smartdrying.io/event/remove/${id}`)
+    if(response.ok){
+      this.props.getChartEvents(this.props.dryingGroupId);
+    }
+
+  }
+  buttonStyle = {
+    background: 'crimson',
+    marginLeft:'0.25rem',
+    color: 'white',
+    fontWeight:600,
+    border: 'none',
+    borderRadius:'5px',
+    fontSize:'0.6rem',
+    cursor: 'pointer',
+    padding:'0.3rem'
+    }
+
+  render() {
+
+    const { viewBox, event, eventTypes } = this.props;
+    const x = viewBox.width + viewBox.x + 5;
+    const y = viewBox.y;
+    return (
+      <foreignObject x={x} y={y} 
+      width="130" height='24'
+      style={{
+        fontSize:'0.75rem',
+        zIndex:5
+      }}
+      // dy={10} dx={-10}
+      >
+        <span>{eventTypes[event.event_type_id - 1].description}</span>
+       <button 
+        style={this.buttonStyle}
+         onClick={()=>this.deleteEvent(this.props.event.id)}
+         >X</button>
+      </foreignObject>
+    );
+  }
+}
+
+export default class MultipleZoomChart extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -48,10 +96,111 @@ export default class SingleZoomChart extends React.Component {
       refAreaRight: "",
       animation: true,
       labels: props.data.labels,
-      events: props.chartEvents
+      addEventForm: false,
+      events: props.chartEvents,
+      eventTypes: props.eventTypes,
+      newEventTimeStamp: false,
+      newEventType: "",
     };
-      
   }
+
+  makePostRequest = async (date, time, type) => {
+    let formattedDate = date.split("/").reverse().join("-") + " " + time;
+
+    let { project_id, id, location_id } = this.props.dryingGroup;
+
+    let data = {
+      project_id: project_id,
+      drying_group_id: id,
+      location_id: location_id,
+      event_type_id: type,
+      timestamp: formattedDate,
+    };
+
+    let response = await fetch("https://api.smartdrying.io/event/add", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (response.ok) {
+      this.props.getChartEvents(id);
+    } else {
+      response = await response.json();
+      let error = JSON.parse(response.body);
+      alert(error.partialFailureErrors.trigger);
+      return;
+    }
+  };
+
+  AddEventForm = (types, timestamp) => {
+    let date = "";
+    let time = "";
+    let eventType = "";
+    let timestampDisplay = "Click on the chart to select a date";
+    if (timestamp) {
+      date = timeConverter(timestamp).date;
+      time = timeConverter(timestamp).time;
+      timestampDisplay = date + " " + time;
+    }
+
+    const setEventType = (e) => {
+      this.setState({ newEventType: e.target.value });
+    };
+
+    return (
+      <div className="addEventContainer" style={{}}>
+        <div className="timestamp-section">
+          <label htmlFor="#event-timestamp">Timestamp:</label>
+          <input
+            id="event-timestamp"
+            value={timestampDisplay}
+            placeholder="Click on a point in chart to "
+            className="timestamp-input"
+          />
+        </div>
+        <div className="event-type-selector">
+          <span>Event Type</span>
+          <select
+            id="event-type-selector"
+            onChange={setEventType}
+            className="select-dropdown"
+          >
+            <option disabled selected>
+              Choose an event type
+            </option>
+            {types.map((type, idx) => {
+              return (
+                <option value={type.id} key={idx}>
+                  {type.description}
+                </option>
+              );
+            })}
+          </select>
+        </div>
+        <div className="add-event-buttons">
+          <Button
+            variant="outlined"
+            onClick={() => {
+              this.makePostRequest(date, time, this.state.newEventType);
+            }}
+            className="add-event-button"
+            style={{ marginRight: "1rem" }}
+          >
+            Add Event
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={() => {
+              this.setState({ addEventForm: false });
+            }}
+            className="add-event-button"
+          >
+            Cancel
+          </Button>
+        </div>
+      </div>
+    );
+  };
 
   zoom() {
     let { refAreaLeft, refAreaRight, data } = this.state;
@@ -63,7 +212,6 @@ export default class SingleZoomChart extends React.Component {
       });
       return;
     }
-
 
     // xAxis domain
     if (refAreaLeft > refAreaRight) {
@@ -88,11 +236,14 @@ export default class SingleZoomChart extends React.Component {
       left: "dataMin",
       right: "dataMax",
       top: "dataMax+1",
-      bottom: "dataMin-1"
+      bottom: "dataMin-1",
     }));
   }
 
   handleMouseDown(e) {
+    let { addEventForm } = this.state;
+    if (addEventForm) return;
+
     try {
       this.setState({ refAreaLeft: e.activeLabel });
     } catch {
@@ -101,13 +252,14 @@ export default class SingleZoomChart extends React.Component {
   }
 
   handleMouseMove(e) {
+    let { addEventForm } = this.state;
+    if (addEventForm) return;
     try {
       this.state.refAreaLeft && this.setState({ refAreaRight: e.activeLabel });
     } catch {
       console.log("Click out of bounds");
     }
   }
-
   formatXAxis(tickItem) {
     // let label = new Date(tickItem).toLocaleDateString('de-DE') + ' ' + new Date(tickItem).toLocaleTimeString('de-DE')
     // return label
@@ -120,80 +272,128 @@ export default class SingleZoomChart extends React.Component {
   }
 
   legendFormatter = (value, entry, index) => {
-    let splitted = this.state.labels[value].split('_')
-    return splitted[splitted.length -1]
-  }
+    let splitted = this.state.labels[value].split("_");
+    return splitted[splitted.length - 1];
+  };
 
-  renderTooltip = (e) =>{
-    if(!e.payload) return <div></div>
-    try{
-      let color1 = e.payload[0].color
-      let {data1, timestamp_unix} = e.payload[0].payload 
-      let formatted = timeConverter(timestamp_unix)
-    return (
-   
-    <div style={{border: '1px solid  silver', borderRadius:'5px', background:'white', padding:'0.5rem 1rem'}}>
-        <p>{formatted.date} {formatted.time}</p>
-        <p style={{color: color1}}>{this.props.data.labels.data1} : {data1.toFixed(2)}</p>
-    </div>
-    )
-    }catch(err){
-      return <div></div>
+  renderTooltip = (e) => {
+    if (!e.payload) return <div></div>;
+    try {
+      let color1 = e.payload[0].color;
+      let { data1, timestamp_unix } = e.payload[0].payload;
+      let formatted = timeConverter(timestamp_unix);
+      return (
+        <div
+          style={{
+            border: "1px solid  silver",
+            borderRadius: "5px",
+            background: "white",
+            padding: "0.5rem 1rem",
+          }}
+        >
+          <p>
+            {formatted.date} {formatted.time}
+          </p>
+          <p style={{ color: color1 }}>
+            {this.props.data.labels.data1} : {data1.toFixed(2)}
+          </p>
+        </div>
+      );
+    } catch (err) {
+      return <div></div>;
     }
-    
-    
-  }
+  };
+
+  setNewEventTimeStamp = (e) => {
+    let { addEventForm } = this.state;
+    if (!addEventForm) return;
+
+    try {
+      this.setState({ newEventTimeStamp: e.activeLabel });
+    } catch {
+      return;
+    }
+  };
 
   render() {
-    const { data, left, right, refAreaLeft, refAreaRight, events } =
-      this.state;
-
+    const {
+      data,
+      left,
+      right,
+      refAreaLeft,
+      refAreaRight,
+      events,
+      eventTypes,
+      addEventForm,
+      newEventTimeStamp,
+    } = this.state;
 
     return (
       <>
         {data && (
           <div className="highlight-bar-charts" style={{ userSelect: "none" }}>
-            <div style={{marginBottom: '1rem'}}>
-            <p style={{fontSize: '1.1rem', fontWeight: 600, marginLeft: '2rem'}}>{this.props.data.kpi.toUpperCase()}</p>
-            <div style={{ display:'inline-block', width:'70%', marginLeft:'2rem', marginBottom:'1rem' }}>
+            <div style={{ marginBottom: "1rem" }}>
+              <p
+                style={{
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                  marginLeft: "2rem",
+                }}
+              >
+                {this.props.data.kpi.toUpperCase()}
+              </p>
+              <div
+                style={{
+                  display: "inline-block",
+                  width: "100%",
+                  marginLeft: "2rem",
+                  marginBottom: "1rem",
+                }}
+              >
                 <Button
                   variant="outlined"
                   size="small"
-                  style={{
-                    borderColor: "#002884",
-                    fontSize:'0.75rem',
-                    padding:'0.1rem 0.5rem',
-                    color: "#002884",
-                    fontWeight: 600,
-                    borderWidth: '2px',
-                    textTransform: 'none'
-                  }}
+                  className="download-csv-button"
                   onClick={() => {
                     DownloadChartData(data);
                   }}
                 >
                   Download as CSV
                 </Button>
+                {addEventForm ? (
+                  <div style={{ width: "95%" }}>
+                    {this.AddEventForm(eventTypes, newEventTimeStamp)}
+                  </div>
+                ) : (
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    className="event-form-opener"
+                    onClick={() => this.setState({ addEventForm: true })}
+                  >
+                    Add an Event
+                  </Button>
+                )}
               </div>
-              </div>
-              {left !== "dataMin" && (
-              <div style={{width: '20%', margin:'auto'}}>
-              <Button
-                onClick={this.zoomOut.bind(this)}
-                variant="outlined"
-                size="small"
-                style={{
-                  borderColor: "rgb(171, 0, 60)",
-                  fontSize: "0.75rem",
-                  padding: "0.1rem 0.5rem",
-                  color: "rgb(171, 0, 60)",
-                  fontWeight: 600,
-                  borderWidth: "2px",
-                  textTransform: "none",
-                }}
-              >
-                Zoom Out
-              </Button>
+            </div>
+            {left !== "dataMin" && (
+              <div style={{ width: "20%", margin: "auto" }}>
+                <Button
+                  onClick={this.zoomOut.bind(this)}
+                  variant="outlined"
+                  size="small"
+                  style={{
+                    borderColor: "rgb(171, 0, 60)",
+                    fontSize: "0.75rem",
+                    padding: "0.1rem 0.5rem",
+                    color: "rgb(171, 0, 60)",
+                    fontWeight: 600,
+                    borderWidth: "2px",
+                    textTransform: "none",
+                  }}
+                >
+                  Zoom Out
+                </Button>
               </div>
             )}
             <ResponsiveContainer width="95%" height={400}>
@@ -201,9 +401,10 @@ export default class SingleZoomChart extends React.Component {
                 data={data}
                 onMouseDown={(e) => this.handleMouseDown(e)}
                 onMouseMove={(e) => this.handleMouseMove(e)}
+                onClick={(e) => this.setNewEventTimeStamp(e)}
                 // eslint-disable-next-line react/jsx-no-bind
                 onMouseUp={this.zoom.bind(this)}
-                margin={{top: 0, right: 0, bottom: 5, left: -60}}
+                margin={{ top: 0, right: 0, bottom: 5, left: -60 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
@@ -213,21 +414,22 @@ export default class SingleZoomChart extends React.Component {
                   allowDataOverflow
                   domain={[left, right]}
                   dataKey="timestamp_unix"
-                  type='number'
-                  xAxisId="0"
-                  tick={<CustomizedAxisTick/>}         
-
+                  type="number"
+                  tick={<CustomizedAxisTick />}
                 />
                 <YAxis
                   allowDataOverflow
                   tickCount={5}
-                  domain={[dataMin => (Math.floor(dataMin/10) *10), dataMax => (Math.ceil(dataMax/10) *10)]}
-                  padding={{top: 10, bottom: 10}}
+                  domain={[
+                    (dataMin) => Math.floor(dataMin / 10) * 10,
+                    (dataMax) => Math.ceil(dataMax / 10) * 10,
+                  ]}
+                  padding={{ top: 30, bottom: 30 }}
                   type="number"
                   yAxisId="1"
                   width={120}
                 />
-                <Tooltip content={this.renderTooltip}/>
+                <Tooltip content={this.renderTooltip} />
                 <Line
                   dot={false}
                   strokeWidth={2}
@@ -237,8 +439,8 @@ export default class SingleZoomChart extends React.Component {
                   stroke="#002884"
                   animationDuration={300}
                 />
-                <Legend formatter={this.legendFormatter}/>
-                {/* Events 
+                <Legend formatter={this.legendFormatter} />
+                {/* Events  */}
                 {events.map((e, idx) => {
                   return (
                     <ReferenceLine
@@ -246,14 +448,15 @@ export default class SingleZoomChart extends React.Component {
                       x={e.timestamp / 1000}
                       xAxisId="0"
                       yAxisId="1"
-                      content={this.renderReferenceLine(e, eventTypes)}
-                      // label={<CustomEventLabel event={e} eventTypes={eventTypes} />}
+                      label={
+                        <CustomEventLabel event={e} eventTypes={eventTypes} getChartEvents={this.props.getChartEvents} dryingGroupId={this.props.dryingGroup.id}/>
+                      }
                       strokeWidth={3}
                       stroke="gray"
                       strokeDasharray="5 5"
                     />
                   );
-                })} */}
+                })}
                 {refAreaLeft && refAreaRight ? (
                   <ReferenceArea
                     yAxisId="1"

@@ -96,7 +96,7 @@ function MeasurementsTab({
     setLoading(true)
     try{
       events = await requestDataFromAPI(`https://api.smartdrying.io/event/get/drying_group/${dryingGroupId}`)
-      console.log('new evs')
+      console.log('new evs', events)
       setChartEvents(events)
     }catch{
       console.log('Error fetching events')
@@ -204,7 +204,7 @@ function MeasurementsTab({
                         if (m.labels.data2) {
                           return <MultipleZoomChart key={idx} data={m} chartEvents={chartEvents} getChartEvents={getChartEvents} dryingGroup={dryingGroup} eventTypes={eventTypes}/>;
                         } else {
-                          return <SingleZoomChart key={idx} data={m} chartEvents={chartEvents} />;
+                          return <SingleZoomChart key={idx} data={m} chartEvents={chartEvents} getChartEvents={getChartEvents} dryingGroup={dryingGroup} eventTypes={eventTypes}/>;
                         }
                       })}
                     </>
