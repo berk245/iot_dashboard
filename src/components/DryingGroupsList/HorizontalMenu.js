@@ -16,7 +16,7 @@ const useStyles = makeStyles(()=> ({
         justifyContent:'flex-start',
         overflow: 'auto',
         padding: '0.5rem 0.5rem',
-        border: '1px solid silver',
+        border: '1px solid #dedede',
         '&::-webkit-scrollbar': {
             height: '0.5rem',
           },

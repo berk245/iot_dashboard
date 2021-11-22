@@ -12,7 +12,7 @@ const useStyles = makeStyles(() => ({
     width: '95%',
     margin: 'auto',
     borderWidth: "0 1px 1px 1px",
-    border: "solid #3F50B5",
+    border: "solid darkgray",
     marginBottom:'1rem',
     borderRadius: '0 0 5px 5px'
   }

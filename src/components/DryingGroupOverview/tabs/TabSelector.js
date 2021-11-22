@@ -9,12 +9,12 @@ const useStyles = makeStyles(() => ({
   },
   singleTab: {
     padding: "1rem",
-    outline: "1px solid #3F50B5",
+    outline: "1px solid darkgray",
     flexBasis: "25%",
-    background: "#f0f0f0",
+    background: "#e2e2e2",
     cursor: "pointer",
     "&:hover": {
-      background: "#e2e2e2",
+      background: "darkgray",
     },
     textAlign: "center",
     "@media (max-width: 1150px)": {
@@ -26,7 +26,7 @@ const useStyles = makeStyles(() => ({
     padding: "1rem",
     margin: '-1px -1px 0 -1px',
     borderWidth: "1px 1px 0 1px",
-    border: "solid #3F50B5",
+    border: "solid darkgray",
     flexBasis: "25%",
     background: "white",
     borderBottom: "none",
