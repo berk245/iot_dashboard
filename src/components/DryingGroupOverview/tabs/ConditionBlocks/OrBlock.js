@@ -1,6 +1,7 @@
 import { Button, makeStyles } from "@material-ui/core";
-import React from "react";
+import React, {useState} from "react";
 import AndConditionBlock from "./AndConditionblock";
+import AndConditionInput from './AndConditionInput'
 
 const useStyles = makeStyles(() => ({
   orBlockTitle: {
@@ -38,7 +39,7 @@ function OrBlock({
   addAndBlock,
   removeAndBlock
 }) {
-
+  const [newAndConditionInput, setNewAndConditionInput] = useState(false)
 
   const classes = useStyles();
   return (
@@ -68,10 +69,23 @@ function OrBlock({
             </div>
           );
         })}
+        {newAndConditionInput &&
+                <AndConditionInput
+                typeNameAndIdPairs={typeNameAndIdPairs}
+                unitNameAndIdPairs={unitNameAndIdPairs}
+                sensorNameAndIdPairs={sensorNameAndIdPairs}
+                operatorNameAndIdPairs={operatorNameAndIdPairs}
+                orBlockIndex={orBlockIndex}
+                addAndBlock={addAndBlock}
+                setNewAndConditionInput={setNewAndConditionInput}
+                />
+              }
         <Button
           variant="contained"
           className={classes.addNewAndConditionButton}
-          onClick={() => addAndBlock(orBlockIndex)}
+          onClick={() => {
+            if(!newAndConditionInput) setNewAndConditionInput(true)
+          }}
         >
           Add New And Condition
         </Button>
