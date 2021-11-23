@@ -10,7 +10,7 @@ const useStyles = makeStyles(() => ({
       fontSize: "0.9rem",
     },
   },
-  orGroup: {
+  orBlock: {
     outline: "1px solid #002884",
     borderRadius: "5px",
     padding: "0.5rem 1rem",
@@ -34,7 +34,9 @@ function OrBlock({
   typeNameAndIdPairs,
   unitNameAndIdPairs,
   removeOrBlock,
-  orBlockIndex
+  orBlockIndex,
+  addAndBlock,
+  removeAndBlock
 }) {
 
 
@@ -42,19 +44,23 @@ function OrBlock({
   return (
     <>
       <h4 className={classes.orBlockTitle}>{title}</h4>
-      <div className={classes.orGroup}>
-        {conditions.map((andCondition, andIndex) => {
+      <div className={classes.orBlock}>
+        {conditions.map((andCondition, andBlockIndex) => {
           return (
-            <div key={andIndex}>
+            <div key={andBlockIndex}>
               <AndConditionBlock
                 typeNameAndIdPairs={typeNameAndIdPairs}
                 unitNameAndIdPairs={unitNameAndIdPairs}
                 sensorNameAndIdPairs={sensorNameAndIdPairs}
                 operatorNameAndIdPairs={operatorNameAndIdPairs}
+                orBlockIndex={orBlockIndex}
+                andBlockIndex={andBlockIndex}
                 andCondition={andCondition}
+                addAndBlock={addAndBlock}
+                removeAndBlock={removeAndBlock}
               />
 
-              {andIndex !== conditions.length - 1 && (
+              {andBlockIndex !== conditions.length - 1 && (
                 <h5 style={{ margin: "0.75rem auto", color: "#AB003C" }}>
                   AND
                 </h5>
@@ -65,7 +71,7 @@ function OrBlock({
         <Button
           variant="contained"
           className={classes.addNewAndConditionButton}
-          // onClick={() => openForm(group, index)}
+          onClick={() => addAndBlock(orBlockIndex)}
         >
           Add New And Condition
         </Button>

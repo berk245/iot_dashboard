@@ -55,7 +55,19 @@ function CriteriaTab({
     arr.splice(index,1)
     setCriterionToUpdate(arr)
   }
-  
+
+  const addAndBlock = (orBlockIndex) => {
+    let arr = [...criterionToUpdate]
+    console.log(arr)
+    // arr[orBlockIndex].and
+  }
+
+  const removeAndBlock = (orBlockIndex, andBlockIndex) => {
+    let arr = [...criterionToUpdate]
+    arr[orBlockIndex].and.splice(andBlockIndex,1)
+    setCriterionToUpdate(arr)
+  }
+
 
   
   const classes = useStyles();
@@ -76,6 +88,8 @@ function CriteriaTab({
                   operatorNameAndIdPairs={operatorNameAndIdPairs}
                   removeOrBlock={removeOrBlock}
                   orBlockIndex={index}
+                  addAndBlock={addAndBlock}
+                  removeAndBlock={removeAndBlock}
                 />
                 {index !== criterionToUpdate.length - 1 && (
                   <h3 style={{ width: '92%', fontWeight:600, margin: "1.5rem auto", color: "#002884" }}>

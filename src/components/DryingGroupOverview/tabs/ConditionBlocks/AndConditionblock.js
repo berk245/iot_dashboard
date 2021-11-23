@@ -69,6 +69,9 @@ function AndConditionBlock({
   sensorNameAndIdPairs,
   typeNameAndIdPairs,
   unitNameAndIdPairs,
+  orBlockIndex,
+  andBlockIndex,
+  removeAndBlock
 }) {
   const classes = useStyles();
   return (
@@ -101,7 +104,7 @@ function AndConditionBlock({
           variant="outlined"
           size="small"
           className={classes.removeButton}
-          //   onClick={() => removeCondition(index, andIndex)}
+          onClick={() => removeAndBlock(orBlockIndex, andBlockIndex)}
         >
           Remove
         </Button>
