@@ -17,6 +17,7 @@ function CriteriaTab({
   operatorNameAndIdPairs,
 }) {
   const [criterion, setCriterion] = useState([]);
+  const [criterionToUpdate, setCriterionToUpdate] = useState([])
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(false);
 
@@ -32,6 +33,7 @@ function CriteriaTab({
         if (Array.isArray(criteria)) {
           let arr = helpers.extractAndSetCriteriaArray(criteria);
           setCriterion(arr);
+          setCriterionToUpdate(arr)
         } else setFetchError(true);
       }
       setLoading(false);
@@ -42,12 +44,26 @@ function CriteriaTab({
     };
   }, [dryingGroup]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const addNewOrBlock = () => {
+    let arr = [...criterionToUpdate]
+    arr.push({and: []})
+    setCriterionToUpdate(arr)
+  }
+
+  const removeOrBlock = (index) =>{
+    let arr = [...criterionToUpdate]
+    arr.splice(index,1)
+    setCriterionToUpdate(arr)
+  }
+  
+
+  
   const classes = useStyles();
   return (
     <div style={{paddingTop:'2rem'}}>
      
       {criterion ? (
-        criterion.map((group, index) => {
+        criterionToUpdate.map((group, index) => {
           return (
             <div key={index}>
               <div>
@@ -58,11 +74,13 @@ function CriteriaTab({
                   unitNameAndIdPairs={unitNameAndIdPairs}
                   sensorNameAndIdPairs={sensorNameAndIdPairs}
                   operatorNameAndIdPairs={operatorNameAndIdPairs}
+                  removeOrBlock={removeOrBlock}
+                  orBlockIndex={index}
                 />
-                {index !== criterion.length - 1 && (
-                  <h4 style={{ margin: "1.5rem 2rem", color: "#002884" }}>
+                {index !== criterionToUpdate.length - 1 && (
+                  <h3 style={{ width: '92%', fontWeight:600, margin: "1.5rem auto", color: "#002884" }}>
                     OR
-                  </h4>
+                  </h3>
                 )}
               </div>
             </div>
@@ -79,10 +97,25 @@ function CriteriaTab({
             margin: "1rem auto 2rem 4%",
             borderColor: "rgb(171, 0, 60)",
           }}
-          //   onClick={() => removeOrBlock(index)}
+          onClick={() => addNewOrBlock()}
         >
           Add a New Condition Block
         </Button>
+
+
+        {JSON.stringify(criterion) !== JSON.stringify(criterionToUpdate) ? 
+        <div className={classes.submitSection}>
+        
+        <Button  variant='outlined'>
+          Submit Changes
+        </Button>
+        <Button variant='outlined' onClick={() => setCriterionToUpdate(criterion)}>
+          Cancel
+        </Button>
+        </div>
+        :
+        null  
+      }
     </div>
   );
 }
