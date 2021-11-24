@@ -1,9 +1,10 @@
-import { makeStyles } from "@material-ui/core";
-import React from "react";
-
+import { makeStyles, Button } from "@material-ui/core";
+import React, { useState } from "react";
+import AddAlarmForm from "./AddAlarmForm";
+import SingleAlarmRow from "./SingleAlarmRow";
 const useStyles = makeStyles(() => ({
   sensorTable: {
-    width: "90%",
+    width: "95%",
     margin: "0rem auto",
     outline: "1px solid silver",
     borderRadius: "5px",
@@ -14,88 +15,75 @@ const useStyles = makeStyles(() => ({
       width: "100%",
     },
   },
-  tableHeader:{ 
-    borderBottom: "2px solid silver", 
-    textAlign:'left',
-    width: 'auto',
+  headersRow: {
+    width: "95%",
+    margin: "auto",
+    display: "flex",
+    justifyContent: "space-between",
+    borderBottom: "2px solid gray",
+  },
+  tableHeader: {
+    textAlign: "left",
+    width: "19%",
+    fontWeight: 600,
     "@media (max-width: 1150px)": {
       fontSize: "0.9rem",
     },
-  }
-
+  },
 }));
 
-function SensorsTable({
+function AlarmsTable({
   alarms,
+  getAlarms,
   sensorNameAndIdPairs,
   typeNameAndIdPairs,
   unitNameAndIdPairs,
 }) {
+  const [newAlarmForm, setNewAlarmForm] = useState();
+
+  console.log(newAlarmForm)
   const classes = useStyles();
   return (
     <div>
-      {alarms.length ?
-      <table className={classes.sensorTable}>
-        <tr>
-          <th className={classes.tableHeader}>Sensor</th>
-          <th className={classes.tableHeader}>Measurement Type</th>
-          <th className={classes.tableHeader}>Min Threshold</th>
-          <th className={classes.tableHeader}>Max Threshold</th>
-          <th className={classes.tableHeader}>Measurement Unit</th>
-        </tr>
-        {alarms.map((alarm, index) => {
-          return (
-            <>
-              <tr key={index}>
-                <td
-                  style={{
-                    borderBottom: "1px solid silver",
-                    padding: "0.25rem",
-                  }}
-                >
-                  {sensorNameAndIdPairs[alarm.sensor_id]} / {alarm.sensor_id}
-                </td>
-                <td
-                  style={{
-                    borderBottom: "1px solid silver",
-                    padding: "0.25rem",
-                  }}
-                >
-                  {typeNameAndIdPairs[alarm.measurement_type_id]}
-                </td>
-                <td
-                  style={{
-                    borderBottom: "1px solid silver",
-                    padding: "0.25rem",
-                  }}
-                >
-                  {alarm.min_allowed_threshold}
-                </td>
-                <td
-                  style={{
-                    borderBottom: "1px solid silver",
-                    padding: "0.25rem",
-                  }}
-                >
-                  {alarm.max_allowed_threshold}
-                </td>
-                <td
-                  style={{
-                    borderBottom: "1px solid silver",
-                    padding: "0.25rem",
-                  }}
-                >
-                  {unitNameAndIdPairs[alarm.measurement_type_id]}
-                </td>
-              </tr>
-            </>
-          );
-        })}
-      </table> : 
-      <p style={{textAlign:'center', padding:'2rem', fontSize:'1.1rem'}}>This project does not have any alarms</p>
-      }
+      {alarms.length ? (
+        <div className={classes.sensorTable}>
+          <div className={classes.headersRow}>
+            <span className={classes.tableHeader}>Sensor</span>
+            <span className={classes.tableHeader}>Measurement Type</span>
+            <span className={classes.tableHeader}>Min threshold</span>
+            <span className={classes.tableHeader}>Max threshold</span>
+            <span className={classes.tableHeader}>Measurement Unit</span>
+            <span style={{ width: "5%" }}></span>
+          </div>
+          {alarms.map((alarm, index) => {
+            return (
+              <SingleAlarmRow
+                key={index}
+                alarm={alarm}
+                ixdex={index}
+                sensorNameAndIdPairs={sensorNameAndIdPairs}
+                typeNameAndIdPairs={typeNameAndIdPairs}
+                unitNameAndIdPairs={unitNameAndIdPairs}
+                getAlarms={getAlarms}
+              />
+            );
+          })}
+          {newAlarmForm && <AddAlarmForm setNewAlarmForm={setNewAlarmForm} getAlarms={getAlarms} />}
+        </div>
+      ) : (
+        <p>This project does not have any alarms</p>
+      )}
+      {!newAlarmForm && (
+        <Button variant="outlined" onClick={() => {
+          setNewAlarmForm(true)
+          console.log('Set')  
+        }
+          }>
+          Add a new alarm
+        </Button>
+      )}
     </div>
   );
 }
 
-export default SensorsTable;
+export default AlarmsTable;

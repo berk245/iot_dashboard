@@ -14,16 +14,18 @@ function AlarmsTab({
 }) {
   const [alarms, setAlarms] = useState([]);
   const [loading, setLoading] = useState(false)
+  
+  const getAlarms = async () => {
+    setLoading(true)
+    let date = await requestDataFromAPI(`https://api.smartdrying.io/alarm/get/drying_group/${dryingGroup.id}`);
+    setAlarms(date);
+    setLoading(false)
+  };
+
+  
   useEffect(() => {
     let isMounted = true
-    const getAlarms = async () => {
-      setLoading(true)
-      let date = await requestDataFromAPI(`https://api.smartdrying.io/alarm/get/drying_group/${dryingGroup.id}`);
-      if(isMounted) setAlarms(date);
-      setLoading(false)
-    };
-
-    getAlarms();
+    if(isMounted) getAlarms()
     return()=>{isMounted = false}
   }, []);
 
@@ -37,7 +39,7 @@ function AlarmsTab({
          <>
         {alarms ? 
         <div style={{padding: '3rem 2rem'}}>
-            <AlarmsTable alarms={alarms} sensorNameAndIdPairs={sensorNameAndIdPairs} typeNameAndIdPairs={typeNameAndIdPairs} unitNameAndIdPairs={unitNameAndIdPairs} /> 
+            <AlarmsTable alarms={alarms} getAlarms={getAlarms} sensorNameAndIdPairs={sensorNameAndIdPairs} typeNameAndIdPairs={typeNameAndIdPairs} unitNameAndIdPairs={unitNameAndIdPairs} /> 
 
         </div>
         :
