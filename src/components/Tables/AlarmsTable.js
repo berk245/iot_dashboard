@@ -33,6 +33,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 function AlarmsTable({
+  dryingGroup,
   alarms,
   getAlarms,
   sensorNameAndIdPairs,
@@ -41,18 +42,22 @@ function AlarmsTable({
 }) {
   const [newAlarmForm, setNewAlarmForm] = useState();
 
-  console.log(newAlarmForm)
+  console.log(newAlarmForm);
   const classes = useStyles();
   return (
     <div>
-      {alarms.length ? (
+      {alarms.length || newAlarmForm ? (
         <div className={classes.sensorTable}>
           <div className={classes.headersRow}>
             <span className={classes.tableHeader}>Sensor</span>
             <span className={classes.tableHeader}>Measurement Type</span>
             <span className={classes.tableHeader}>Min threshold</span>
             <span className={classes.tableHeader}>Max threshold</span>
+            {newAlarmForm?
+            <span className={classes.tableHeader}></span>
+            :
             <span className={classes.tableHeader}>Measurement Unit</span>
+            }
             <span style={{ width: "5%" }}></span>
           </div>
           {alarms.map((alarm, index) => {
@@ -68,17 +73,27 @@ function AlarmsTable({
               />
             );
           })}
-          {newAlarmForm && <AddAlarmForm setNewAlarmForm={setNewAlarmForm} getAlarms={getAlarms} />}
+          {newAlarmForm && (
+            <AddAlarmForm
+              dryingGroup={dryingGroup}
+              setNewAlarmForm={setNewAlarmForm}
+              getAlarms={getAlarms}
+              sensorNameAndIdPairs={sensorNameAndIdPairs}
+              typeNameAndIdPairs={typeNameAndIdPairs}
+              unitNameAndIdPairs={unitNameAndIdPairs}
+            />
+          )}
         </div>
       ) : (
         <p>This project does not have any alarms</p>
       )}
       {!newAlarmForm && (
-        <Button variant="outlined" onClick={() => {
-          setNewAlarmForm(true)
-          console.log('Set')  
-        }
-          }>
+        <Button
+          variant="outlined"
+          onClick={() => {
+            setNewAlarmForm(true);
+          }}
+        >
           Add a new alarm
         </Button>
       )}

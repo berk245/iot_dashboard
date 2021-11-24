@@ -38,7 +38,6 @@ function SingleAlarmRow({
     }catch(err){
         console.log(err)
     }
-
   }  
 
   const classes = useStyles();

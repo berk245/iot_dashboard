@@ -36,18 +36,10 @@ function AlarmsTab({
         {loading ? 
         <CircularLoadingIcon text={'Creating alarms table'}/>
         :
-         <>
-        {alarms ? 
         <div style={{padding: '3rem 2rem'}}>
-            <AlarmsTable alarms={alarms} getAlarms={getAlarms} sensorNameAndIdPairs={sensorNameAndIdPairs} typeNameAndIdPairs={typeNameAndIdPairs} unitNameAndIdPairs={unitNameAndIdPairs} /> 
-
+            <AlarmsTable dryingGroup={dryingGroup} alarms={alarms} getAlarms={getAlarms} sensorNameAndIdPairs={sensorNameAndIdPairs} typeNameAndIdPairs={typeNameAndIdPairs} unitNameAndIdPairs={unitNameAndIdPairs} /> 
         </div>
-        :
-        <p>This project does not have any alarms</p> 
 }
-        </>   
-    }
-        
     </div>
   );
 }
