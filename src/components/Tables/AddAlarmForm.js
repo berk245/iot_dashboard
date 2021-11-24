@@ -27,7 +27,7 @@ function AddAlarmForm({
   
   const [newAlarm, setNewAlarm] = useState({
     project_id: dryingGroup.project_id || null,
-    location_id: dryingGroup.location_id || null,
+    location_id: dryingGroup.location_id || 1,
     drying_group_id: dryingGroup.id || null,
     sensor_id: null,
     measurement_type_id: null,
@@ -42,8 +42,9 @@ function AddAlarmForm({
   };
 
   const validateBeforeSubmit = (obj) =>{
-      Object.values(obj).map((val) => {
+      Object.entries(obj).map(([key, val]) => {
           if(!val){
+              console.log(key, val)
               alert('Please fill in all the input fields.')
               return false
           }
@@ -68,6 +69,9 @@ function AddAlarmForm({
           );
         if(response.ok){
             getAlarms()
+        }else{
+          response = await response.json()
+          console.log(response)
         }
     }catch(err){
         console.log(err)
