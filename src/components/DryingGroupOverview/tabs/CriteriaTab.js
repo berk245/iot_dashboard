@@ -1,5 +1,5 @@
 import { makeStyles } from "@material-ui/core";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import { Button } from "@material-ui/core";
 import { requestDataFromAPI } from "../../../utils";
 import { helpers } from "./TabHelpers";
@@ -7,7 +7,17 @@ import { helpers } from "./TabHelpers";
 import OrBlock from "./ConditionBlocks/OrBlock";
 import CircularLoadingIcon from "../../CircularLoadingIcon";
 
-const useStyles = makeStyles(() => ({}));
+const useStyles = makeStyles(() => ({
+  submitSection:{
+    width: '92%',
+    margin: 'auto'
+  },
+  submitButton:{
+    width: '48%',
+    margin: '0rem 0rem 2rem 1rem '
+  }
+
+}));
 
 function CriteriaTab({
   dryingGroup,
@@ -26,26 +36,30 @@ function CriteriaTab({
 
   const getCriteria = async () => {
     setLoading(true);
+
     let criteria = await requestDataFromAPI(
       `https://api.smartdrying.io/dry_threshold/get/drying_group/${dryingGroup.id}`
     );
-    try {
-      if (Array.isArray(criteria)) {
-        let arr = helpers.extractAndSetCriteriaArray(criteria);
-        setCriterion(arr);
+    console.log(criteria)
+    if (Array.isArray(criteria)) {    
+      try {
         setCriterionId(criteria[0].id);
-        setCriterionToUpdate(arr);
-      } else setFetchError(true);
-    } catch {
-      setNoStopCriteria(true);
-    } finally {
-      setLoading(false);
+        let arr = helpers.extractAndSetCriteriaArray(criteria);
+        setCriterion([...arr]);
+        setCriterionToUpdate([...arr]);
+      } catch {
+        console.log("Problem with extraction");
+        setNoStopCriteria(true)
+      }
+    } else {
+      setFetchError(true);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
     let isMounted = true;
-    if(isMounted) getCriteria();
+    if (isMounted) getCriteria();
 
     return () => {
       isMounted = false;
@@ -100,7 +114,6 @@ function CriteriaTab({
           }
         );
         response = await response.json();
-        console.log(response);
       } else {
         //Send update request
         let deleteConditionsFirst = await fetch(
@@ -123,7 +136,7 @@ function CriteriaTab({
         );
         if (response.ok) {
           console.log("Success");
-          getCriteria()
+          getCriteria();
         }
       }
     } catch (err) {
@@ -136,10 +149,11 @@ function CriteriaTab({
   return (
     <div style={{ paddingTop: "2rem" }}>
       {loading ? (
-        <CircularLoadingIcon text={"Getting conditions"} />
+        <CircularLoadingIcon text={"Getting criteria"} />
       ) : (
         <>
-          {criterion ? (
+        
+          {criterion.length || criterionToUpdate.length ? (
             criterionToUpdate.map((group, index) => {
               return (
                 <div key={index}>
@@ -173,7 +187,7 @@ function CriteriaTab({
               );
             })
           ) : (
-            <p style={{ padding: "1rem 2rem" }}>
+            <p style={{ padding: "0rem 1rem", marginLeft:'2.5%' }}>
               This project does not have any stop/start crtierion
             </p>
           )}
@@ -190,11 +204,11 @@ function CriteriaTab({
 
           {JSON.stringify(criterion) !== JSON.stringify(criterionToUpdate) ? (
             <div className={classes.submitSection}>
-              <Button variant="outlined" onClick={submitNewConditions}>
+              <Button variant="outlined" style={{background:'#38579f', color:'white', fontSize:'1rem', fontWeight:600}} className={classes.submitButton} onClick={submitNewConditions}>
                 Submit Changes
               </Button>
               <Button
-                variant="outlined"
+                variant="outlined" style={{background:'gray', color:'white', fontSize:'1rem', fontWeight:600}} className={classes.submitButton}
                 onClick={() => setCriterionToUpdate(criterion)}
               >
                 Cancel

@@ -22,8 +22,15 @@ const useStyles = makeStyles(() => ({
     textTransform: "none",
     margin: "1rem 0 ",
     padding: "0.25rem 1rem",
-    background: "#002884c7",
-    color: "white",
+    border: "1px solid #002884c7",
+    boxShadow:'none',
+    color: "#002884c7",
+    background: 'white',
+    fontWeight: 600,
+    '&:hover':{
+      background: "#002884c7",
+    color: 'white',
+    }
   },
 }));
 
