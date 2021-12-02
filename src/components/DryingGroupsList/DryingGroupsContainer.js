@@ -47,7 +47,6 @@ function DryingGroupsContainer({selectedProject, setSelectedProject}) {
             const url = "https://api.smartdrying.io/drying_group/get/project/" + id;
             try{
               let dryingGroups = await requestDataFromAPI(url)
-              console.log(dryingGroups)
               if(dryingGroups && isMounted) setDryingGroups(dryingGroups)
               else if(!dryingGroups && isMounted) setFetchError(true)
             }catch (err) {

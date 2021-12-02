@@ -41,7 +41,6 @@ function DryingGroupOverviewHeader({dryingGroup}) {
 
       const predictions = await requestDataFromAPI(url)
 
-      console.log('P: ', predictions)
       setPredictions(predictions)
       setLoading(false)
   }

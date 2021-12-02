@@ -72,10 +72,8 @@ function SensorAndDateFilter({
   const handleDateChange = (e) => {
     const { name, value } = e.target;
     let obj = { ...selectedDates };
-    console.log(obj);
     if (name == "start_datetime") obj[name] = value + " 00:00:00";
     else if (name == "end_datetime") obj[name] = value + " 23:59:59";
-    console.log(obj);
     setSelectedDates(obj);
   };
   const classes = useStyles();

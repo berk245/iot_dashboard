@@ -108,6 +108,8 @@ function AndConditionInput({
   };
 
   const submitNewAndBlock = () =>{
+
+    newAndBlock.measurement_unit_id = newAndBlock.measurement_type_id 
     for(let [k,v] of Object.entries(newAndBlock)){
         if(!v) {
             alert('Please fill in all the fields')

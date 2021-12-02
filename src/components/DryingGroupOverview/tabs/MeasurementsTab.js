@@ -96,7 +96,6 @@ function MeasurementsTab({
     setLoading(true)
     try{
       events = await requestDataFromAPI(`https://api.smartdrying.io/event/get/drying_group/${dryingGroupId}`)
-      console.log('new evs', events)
       setChartEvents(events)
     }catch{
       console.log('Error fetching events')

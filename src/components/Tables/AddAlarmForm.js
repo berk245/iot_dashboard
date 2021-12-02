@@ -44,7 +44,6 @@ function AddAlarmForm({
   const validateBeforeSubmit = (obj) =>{
       Object.entries(obj).map(([key, val]) => {
           if(!val){
-              console.log(key, val)
               alert('Please fill in all the input fields.')
               return false
           }
@@ -71,7 +70,6 @@ function AddAlarmForm({
             getAlarms()
         }else{
           response = await response.json()
-          console.log(response)
         }
     }catch(err){
         console.log(err)

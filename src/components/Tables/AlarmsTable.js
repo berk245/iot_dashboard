@@ -42,7 +42,6 @@ function AlarmsTable({
 }) {
   const [newAlarmForm, setNewAlarmForm] = useState();
 
-  console.log(newAlarmForm);
   const classes = useStyles();
   return (
     <div>

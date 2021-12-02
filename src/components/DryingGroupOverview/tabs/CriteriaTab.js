@@ -40,7 +40,6 @@ function CriteriaTab({
     let criteria = await requestDataFromAPI(
       `https://api.smartdrying.io/dry_threshold/get/drying_group/${dryingGroup.id}`
     );
-    console.log(criteria)
     if (Array.isArray(criteria)) {    
       try {
         setCriterionId(criteria[0].id);
@@ -69,35 +68,39 @@ function CriteriaTab({
   const addNewOrBlock = () => {
     let arr = JSON.parse(JSON.stringify(criterionToUpdate));
     arr.push({ and: [] });
-    setCriterionToUpdate(arr);
+    submitNewConditions(arr)
   };
 
   const removeOrBlock = (index) => {
+    let confirm = window.confirm('Are you sure you want to remove the or block?')
+    if(!confirm) return
     let arr = JSON.parse(JSON.stringify(criterionToUpdate));
     arr.splice(index, 1);
-    setCriterionToUpdate(arr);
+    submitNewConditions(arr)
   };
 
   const addAndBlock = (orBlockIndex, newAndBlock) => {
     let arr = JSON.parse(JSON.stringify(criterionToUpdate));
-
     arr[orBlockIndex].and.push(newAndBlock);
-    setCriterionToUpdate(arr);
+    submitNewConditions(arr)
+
   };
 
   const removeAndBlock = (orBlockIndex, andBlockIndex) => {
+    let confirm = window.confirm('Are you sure you want to remove this condition?')
+    if(!confirm) return
     let arr = JSON.parse(JSON.stringify(criterionToUpdate));
     arr[orBlockIndex].and.splice(andBlockIndex, 1);
-    setCriterionToUpdate(arr);
+    submitNewConditions(arr)
   };
 
-  const submitNewConditions = async () => {
+  const submitNewConditions = async (arr) => {
     let { project_id, location_id, id } = dryingGroup;
     let requestBody = {
       project_id: Number(project_id),
       location_id: Number(location_id),
       drying_group_id: Number(id),
-      condition: { or: criterionToUpdate },
+      condition: { or: arr },
     };
     try {
       if (noStopCriteria) {

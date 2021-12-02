@@ -54,7 +54,6 @@ function HorizontalMenu({dryingGroups, selectedDryingGroup, setSelectedDryingGro
             
         }
 
-        console.log('P: ', predictions)
         setPredictions(predictions)
         setLoading(false)
     }
