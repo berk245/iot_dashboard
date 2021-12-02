@@ -13,7 +13,7 @@ const useStyles = makeStyles(() => ({
     alignItems: "center",
   },
   smallConditionCell: {
-    flexBasis: "7.5%",
+    flexBasis: "5%",
     // "@media (max-width: 1500px) and (min-width: 1025px)": {
     //   width: "25%",
     //   fontSize: "0.9rem",
@@ -24,14 +24,15 @@ const useStyles = makeStyles(() => ({
     },
   },
   largeConditionCell: {
-    flexBasis: "20%",
+    flexBasis: "15%",
     "@media (max-width: 1150px)": {
       flexBasis: "22.5%",
       fontSize: "0.8rem",
     },
   },
   removeButtonCell: {
-    flexBasis: "5%",
+    textAlign:'center',
+    flexBasis: "20%",
     // "@media (max-width: 1500px) and (min-width: 1150px)": {
     //   width: "25%",
     //   fontSize: "0.9rem",

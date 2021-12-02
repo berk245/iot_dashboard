@@ -46,8 +46,8 @@ function InformationTab({ dryingGroup, dryingTypes }) {
     `https://api.smartdrying.io/dry_prediction/get/drying_group/${dryingGroup.id}`
 
     let result = await requestDataFromAPI(url)
-    
-    setPredictionData(result)
+    console.log(result)
+    // setPredictionData(result)
   }
   useEffect(()=>{
     let isMounted = true
@@ -107,7 +107,7 @@ function InformationTab({ dryingGroup, dryingTypes }) {
       <div style={{width:'60%', margin: 'auto'}}>
         {predictionData ?
         <PredictionChart predictionData={predictionData}/>:
-        <p>No predictions available for this chart at the moment.</p>
+        <p>No predictions available for this drying group at the moment.</p>
         
       }
       </div>

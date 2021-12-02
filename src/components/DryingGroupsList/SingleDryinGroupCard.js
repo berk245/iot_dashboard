@@ -1,6 +1,6 @@
 import { makeStyles, responsiveFontSizes } from '@material-ui/core'
 import { mergeClasses } from '@material-ui/styles'
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 
 const useStyles = makeStyles(() =>( {
     selectedCard:{
@@ -41,8 +41,22 @@ const useStyles = makeStyles(() =>( {
         marginBottom:'1rem'
       },
 }))
-function DryingGroupCard({dryingGroup, clicked, setSelectedDryingGroup }) {
+function DryingGroupCard({dryingGroup, predictions, clicked, setSelectedDryingGroup }) {
     const classes = useStyles()
+    const [minDate, setMinDate] = useState('')
+    const [maxDate, setMaxDate] = useState('')
+
+    useEffect(() => {
+      try{
+         setMinDate(predictions.min_dry_date.split('-').reverse().join('/'))
+         setMaxDate(predictions.max_dry_date.split('-').reverse().join('/'))
+      }catch{
+        console.log("Couldn't parse prediction dates")
+      }
+    }, [])
+    
+    
+
     return (
         <div data-testid='drying-group-card'  className={clicked ? classes.selectedCard : classes.dryingGroupCard} onClick={()=> {setSelectedDryingGroup(dryingGroup)}}>
             <div className={classes.singleLine}>
@@ -55,7 +69,7 @@ function DryingGroupCard({dryingGroup, clicked, setSelectedDryingGroup }) {
             <div className={classes.singleLine}>
               <span style={{marginRight: '0.5rem', marginBottom:'1rem', display: 'inline-block'}}>Expected completion:</span>
               <span className={clicked? classes.predictionTextWhite : classes.predictionTextRed}>
-                21/12/2021 - 25/12/2021
+                {minDate} - {maxDate}
               </span>
               </div>
         </div>

@@ -87,7 +87,6 @@ function CriteriaTab({
 
   const removeAndBlock = (orBlockIndex, andBlockIndex) => {
     let arr = JSON.parse(JSON.stringify(criterionToUpdate));
-
     arr[orBlockIndex].and.splice(andBlockIndex, 1);
     setCriterionToUpdate(arr);
   };

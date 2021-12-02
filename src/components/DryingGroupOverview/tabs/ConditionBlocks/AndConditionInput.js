@@ -13,7 +13,7 @@ const useStyles = makeStyles(() => ({
     alignItems: "center",
   },
   smallConditionCell: {
-    flexBasis: "7.5%",
+    flexBasis: "15%",
     // "@media (max-width: 1500px) and (min-width: 1025px)": {
     //   width: "25%",
     //   fontSize: "0.9rem",
@@ -24,14 +24,23 @@ const useStyles = makeStyles(() => ({
     },
   },
   largeConditionCell: {
-    flexBasis: "20%",
+    flexBasis: "25%",
     "@media (max-width: 1150px)": {
       flexBasis: "15%",
       fontSize: "0.8rem",
     },
   },
+  extraLargeConditionCell: {
+    flexBasis: "30%",
+    "@media (max-width: 1150px)": {
+      flexBasis: "20%",
+      fontSize: "0.8rem",
+    },
+  },
   removeButtonCell: {
-    flexBasis: "5%",
+    flexBasis: "15%",
+    display:'flex',
+    justifyContent:'space-around',
     // "@media (max-width: 1500px) and (min-width: 1150px)": {
     //   width: "25%",
     //   fontSize: "0.9rem",
@@ -42,8 +51,9 @@ const useStyles = makeStyles(() => ({
       fontSize: "0.9rem",
     },
   },
-  removeButton: {
+  cancelButton: {
     textTransform: "none",
+    borderColor:'crimson',
     padding: "0.15rem 0.5rem",
     fontSize: "0.8rem",
     "&:hover": {
@@ -51,7 +61,20 @@ const useStyles = makeStyles(() => ({
       color: "white",
     },
     "@media (max-width: 1150px)": {
-      width: "100%",
+      width: "40%",
+    },
+  },
+  addButton: {
+    textTransform: "none",
+    borderColor:'#002884',
+    padding: "0.15rem 0.5rem",
+    fontSize: "0.8rem",
+    "&:hover": {
+      background: "gray",
+      color: "white",
+    },
+    "@media (max-width: 1150px)": {
+      width: "40%",
     },
   },
   longText: {
@@ -118,7 +141,7 @@ function AndConditionInput({
           })}
         </select>
       </div>
-      <div className={classes.largeConditionCell}>
+      <div className={classes.smallConditionCell}>
         <p style={{ fontWeight: "600" }}> Measurement Type</p>
         <select
           onChange={(e) => handleInputChange(e, "measurement_type_id")}
@@ -137,10 +160,10 @@ function AndConditionInput({
           })}
         </select>
       </div>
-      <div className={classes.largeConditionCell}>
+      <div className={classes.extraLargeConditionCell}>
         <p style={{ fontWeight: "600" }}> Condition</p>
         <select
-          style={{ display: "inline-block" }}
+          style={{ display: "inline-block", width:'35%' }}
           onChange={(e) => handleInputChange(e, "operator_id")}
           name=""
           id=""
@@ -156,40 +179,33 @@ function AndConditionInput({
         </select>
         <input
           type="number"
-          style={{ marginLeft: "2.5%", display: "inline-block" }}
+          style={{ marginLeft: "2.5%", display: "inline-block", width:'55%'}}
+          placeholder='Threshold value'
           onChange={(e) => handleInputChange(e, "threshold")}
         ></input>
       </div>
-      <div className={classes.largeConditionCell}>
-        <p style={{ fontWeight: "600" }}> Unit</p>
-        <select
-          onChange={(e) => handleInputChange(e, "measurement_unit_id")}
-          name=""
-          id=""
-        >
-          <option disabled selected>
-            Choose a unit
-          </option>
-          {Object.values(unitNameAndIdPairs).map((value, index) => {
-            return (
-              <option key={index} value={index + 1}>
-                {value}
-              </option>
-            );
-          })}
-        </select>
-      </div>
       <div className={classes.removeButtonCell}>
-        <Button
+      <Button
           variant="outlined"
           size="small"
-          className={classes.removeButton}
+          className={classes.addButton}
           onClick={() => {
            submitNewAndBlock();
           }}
         >
           Add And Block
         </Button>
+      <Button
+          variant="outlined"
+          size="small"
+          className={classes.cancelButton}
+          onClick={() => {
+           setNewAndConditionInput(false);
+          }}
+        >
+         Cancel
+        </Button>
+        
       </div>
     </div>
   );

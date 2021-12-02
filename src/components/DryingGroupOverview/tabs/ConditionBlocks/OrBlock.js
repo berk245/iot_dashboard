@@ -5,7 +5,8 @@ import AndConditionInput from './AndConditionInput'
 
 const useStyles = makeStyles(() => ({
   orBlockTitle: {
-    margin: "1rem auto 1rem 4%",
+    margin: "1rem 1rem 1rem 4%",
+    display:'inline-block',
     "@media (max-width: 1150px)": {
       margin: "0.1rem auto 1rem 4%",
       fontSize: "0.9rem",
@@ -52,6 +53,18 @@ function OrBlock({
   return (
     <>
       <h4 className={classes.orBlockTitle}>{title}</h4>
+      <Button
+            variant="outlined"
+            size='small'
+            style={{
+              margin: "1rem 0 ",
+              display:'inline-block',
+              textTransform:'none'
+            }}
+            onClick={() => removeOrBlock(orBlockIndex)}
+          >
+            Remove
+          </Button>
       <div className={classes.orBlock}>
         {conditions.map((andCondition, andBlockIndex) => {
           return (
@@ -96,19 +109,6 @@ function OrBlock({
         >
           Add New And Condition
         </Button>
-        {conditions && (
-          <Button
-            variant="outlined"
-            style={{
-              margin: "1rem 0 ",
-              float: "right",
-              borderColor: "red",
-            }}
-            onClick={() => removeOrBlock(orBlockIndex)}
-          >
-            Remove {title}
-          </Button>
-        )}
       </div>
     </>
   );
