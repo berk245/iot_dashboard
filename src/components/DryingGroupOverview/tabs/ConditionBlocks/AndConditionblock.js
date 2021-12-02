@@ -46,7 +46,7 @@ const useStyles = makeStyles(() => ({
   removeButton: {
     textTransform: "none",
     padding: "0.15rem 0.5rem",
-    fontSize: "0.8rem",
+    fontSize: "0.85rem",
     "&:hover": {
       background: "gray",
       color: "white",
@@ -103,7 +103,6 @@ function AndConditionBlock({
       <div className={classes.removeButtonCell}>
         <Button
           variant="outlined"
-          size="small"
           className={classes.removeButton}
           onClick={() => removeAndBlock(orBlockIndex, andBlockIndex)}
         >

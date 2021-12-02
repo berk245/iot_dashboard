@@ -41,6 +41,7 @@ const useStyles = makeStyles(() => ({
     flexBasis: "15%",
     display:'flex',
     justifyContent:'space-around',
+    marginTop: '1rem',
     // "@media (max-width: 1500px) and (min-width: 1150px)": {
     //   width: "25%",
     //   fontSize: "0.9rem",
@@ -54,10 +55,11 @@ const useStyles = makeStyles(() => ({
   cancelButton: {
     textTransform: "none",
     borderColor:'crimson',
+    color:'crimson',
     padding: "0.15rem 0.5rem",
     fontSize: "0.8rem",
     "&:hover": {
-      background: "gray",
+      background: "crimson",
       color: "white",
     },
     "@media (max-width: 1150px)": {
@@ -67,10 +69,11 @@ const useStyles = makeStyles(() => ({
   addButton: {
     textTransform: "none",
     borderColor:'#002884',
+    color:'#002884',
     padding: "0.15rem 0.5rem",
     fontSize: "0.8rem",
     "&:hover": {
-      background: "gray",
+      background: "#002884",
       color: "white",
     },
     "@media (max-width: 1150px)": {
