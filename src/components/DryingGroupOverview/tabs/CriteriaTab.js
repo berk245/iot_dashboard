@@ -96,6 +96,7 @@ function CriteriaTab({
 
   const submitNewConditions = async (arr) => {
     let { project_id, location_id, id } = dryingGroup;
+    setLoading(true)
     let requestBody = {
       project_id: Number(project_id),
       location_id: Number(location_id),
@@ -144,6 +145,8 @@ function CriteriaTab({
     } catch (err) {
       console.log(err);
       setFetchError(true);
+    }finally{
+      setLoading(false)
     }
   };
 
