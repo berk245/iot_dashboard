@@ -27,6 +27,9 @@ const useStyles = makeStyles(() => ({
 function InformationTab({ dryingGroup, dryingTypes }) {
   const [dryingType, setDryingType] = useState("");
   const [predictionData, setPredictionData] = useState([])
+  const [minDate, setMinDate] = useState('')
+  const [maxDate, setMaxDate] = useState('')
+
   useEffect(() => {
     let isMounted = true  
     const setReadableDryingType = () => {
@@ -46,8 +49,8 @@ function InformationTab({ dryingGroup, dryingTypes }) {
     `https://api.smartdrying.io/dry_prediction/get/drying_group/${dryingGroup.id}`
 
     let result = await requestDataFromAPI(url)
-    console.log(result)
-    // setPredictionData(result)
+    setPredictionData(result.values)
+
   }
   useEffect(()=>{
     let isMounted = true
