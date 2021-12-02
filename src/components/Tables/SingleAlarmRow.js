@@ -58,6 +58,7 @@ function SingleAlarmRow({
           <Button
            variant='outlined'
            size='small'
+           style={{marginBottom: '0.5rem', marginLeft:'-1rem'}}
            onClick={()=> removeAlarm(alarm.id)}
           > Remove </Button>
       </div>
