@@ -1,7 +1,7 @@
 import { makeStyles } from "@material-ui/styles";
 import React, { useEffect, useState } from "react";
 import PredictionChart from "../../Charts/Predictionchart";
-
+import { requestDataFromAPI } from "../../../utils";
 const useStyles = makeStyles(() => ({
   container: {
       paddingTop: '3rem'
@@ -26,6 +26,7 @@ const useStyles = makeStyles(() => ({
 
 function InformationTab({ dryingGroup, dryingTypes }) {
   const [dryingType, setDryingType] = useState("");
+  const [predictionData, setPredictionData] = useState([])
   useEffect(() => {
     let isMounted = true  
     const setReadableDryingType = () => {
@@ -40,6 +41,21 @@ function InformationTab({ dryingGroup, dryingTypes }) {
         isMounted = false
     }
   }, []);
+  const getPredictionData = async() => {
+    let url =
+    `https://api.smartdrying.io/dry_prediction/get/drying_group/${dryingGroup.id}`
+
+    let result = await requestDataFromAPI(url)
+    
+    setPredictionData(result)
+  }
+  useEffect(()=>{
+    let isMounted = true
+    if(isMounted) getPredictionData()
+
+    return() => {isMounted = false}
+  }, [dryingGroup])
+  
 
   const classes = useStyles();
   return (
@@ -88,8 +104,12 @@ function InformationTab({ dryingGroup, dryingTypes }) {
           </span>
         </div>
       </div>
-      <div style={{width:'50%', margin: 'auto'}}>
-      <PredictionChart />
+      <div style={{width:'60%', margin: 'auto'}}>
+        {predictionData ?
+        <PredictionChart predictionData={predictionData}/>:
+        <p>No predictions available for this chart at the moment.</p>
+        
+      }
       </div>
     </div>
   );
